@@ -1,6 +1,77 @@
 #include "Board.hpp"
 using namespace std;
 
+
+void Board::control_generation (int x, int y)
+{
+  int color = colors_grid[x][y];
+  int col = 0;
+  int row = 0;
+  std::vector<int> color_vect{1,2,3,4,5,6};
+  int new_color = color;
+
+  // horizontal vers la droite
+  int i = x + 1;
+  while (i < 9 && color == colors_grid[i][y])
+    {
+      col++;
+      i++;
+    }
+
+  // horizontal vers la gauche
+  i = x;
+  while (i >= 0 && color == colors_grid[i][y])
+    {
+      col++;
+      i--;
+    }
+
+  // vertical vers le haut
+  int j = y + 1;
+  while (j < 9 && color == colors_grid[x][j])
+    {
+      row++;
+      j++;
+    }
+
+  // vertical vers le bas
+  j = y;
+  while (j >= 0 && color == colors_grid[x][j])
+    {
+      if (color == colors_grid[x][j])
+        {
+          row++;
+          j--;
+        }
+    }
+
+  if (col > 2 || row > 2)
+    {
+      while (color == new_color)
+        new_color = color_vect[rand () % color_vect.size ()];
+      colors_grid[x][y] = new_color;
+    }
+
+}
+
+void Board::gen_color_grid ()
+{
+  for (int i = 0; i < 9; i++)
+    {
+      colors_grid.emplace_back ();
+      for (int j = 0; j < 9; j++)
+        {
+          std::vector<int> color_vect{1,2,3,4,5,6};
+          int color = color_vect[rand () % color_vect.size ()];
+          colors_grid[i].push_back (color);
+        }
+    }
+
+  for (int i = 0; i < 9; i++)
+    for (int j = 0; j < 9; j++)
+      control_generation (i, j);
+}
+
 void print_board(int** data)
 {
     for (int x = 0; x < 9; x++)
@@ -85,6 +156,8 @@ void Board::swap(Point ori, Point target) {
     delete_candies(aligned_candies_V);
     printf("-----------\n");
     print_board(board);
+    aligned_candies_H.clear();
+    aligned_candies_V.clear();
 }
 
 /**
@@ -118,10 +191,12 @@ int main(){
     print_board(board);
     printf("-----------\n");
     // bd.swap(Point{4,1}, Point{5,1});
+    // printf("-----------\n");
     // bd.swap(Point{2,7}, Point{3,7});
     // bd.swap(Point{4,4}, Point{4,5});
     // bd.swap(Point{1,0}, Point{1,1});
-    //bd.swap(Point{7,0}, Point{8,0});
+    printf("-----------\n");
+    bd.swap(Point{7,1}, Point{8,1});
     //bd.swap(Point{2,6}, Point{3,6});
     // bd.swap(Point{8,8}, Point{8,7});
     // vector<Point> vector1 = {Point{8,0}, Point{8,1}, Point{8,2}};

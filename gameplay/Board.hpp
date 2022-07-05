@@ -13,6 +13,7 @@ class Board
 {
 	private:
 		int** board = new int*[COL];
+		vector<vector<int>> colors_grid;
         vector<Point> aligned_candies_H, aligned_candies_V;
 	public:
 		Board();
@@ -23,6 +24,8 @@ class Board
         bool is_aligned(Point target);
         void delete_candies(vector<Point> targets);
         void swim(Point p);
+		void control_generation (int x, int y);
+		void gen_color_grid ();
 };
 
 #endif // __BOARD_H__
