@@ -1,8 +1,8 @@
 
 #include "canvas.hpp"
 
-const int windowWidth = 460;
-const int windowHeight = 460;
+const int windowWidth = 500;
+const int windowHeight = 500;
 const double refreshPerSecond = 60;
 
 

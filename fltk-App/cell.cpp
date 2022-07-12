@@ -1,23 +1,77 @@
 #include "cell.hpp"
+#include <mutex>
+
+Cell::Cell (Point center, int w, int h, Fl_Color color) :
+    center{center}, w{w}, h{h}, color{color}
+    {
+      initialize();
+    }
 
 
-Cell::Cell(Point center, int w, int h, Fl_Color frameColor, Fl_Color fillColor):
-  r(center, w, h, frameColor, fillColor) {}
-
-void Cell::draw() {
-  r.draw();
+void Cell::initialize ()
+{
+  square= new Square(FL_UP_BOX, center.x, center.y, w, h, "", color);
+  square->color(color);
 }
 
-void Cell::mouseMove(Point mouseLoc) {
-  if (r.contains(mouseLoc)) {
-    r.setFrameColor(FL_RED);
-  } else {
-    r.setFrameColor(FL_BLACK);
+
+void Cell::draw ()
+{
+
+}
+
+Fl_Color Cell::get_color(){
+  return color;
+}
+
+void Cell ::set_color(Fl_Color new_color){
+  color = new_color;
+}
+
+void Cell ::set_center(Point new_center){
+  center.x = new_center.x;
+  center.y = new_center.y;
+}
+
+void Cell::mouseMove (Point mouseLoc)
+{
+  if (square->contains(mouseLoc)) {
+      square->color(FL_WHITE);
+    } else {
+      square->color(color);
+    }
+}
+
+
+void Cell::mouseClick (Point mouseLoc)
+{
+  if ((square->contains (mouseLoc))){
+    selected = true;
+    //cout << '(' << square->get_position().x << ',' << square->get_position().y << ')' << endl;
   }
 }
 
 
-void Cell::mouseClick(Point mouseLoc) {
-  if (r.contains(mouseLoc))
-    cout << '(' << r.getCenter().x << ',' << r.getCenter().y << ')' << endl;
+void Cell::reposition (Point p)
+{
+  int x = p.x;
+  int y = p.y;
+  cout << "(" << x << "," << y << endl;
+  square->position (x,y);
+  square->redraw();
+}
+
+
+bool Cell::is_selected () const
+{
+  return selected;
+}
+void Cell::unselect ()
+{
+  selected = false;
+}
+
+Point Cell::get_center() const
+{
+  return center;
 }

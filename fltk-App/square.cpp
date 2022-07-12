@@ -1,26 +1,19 @@
 #include "square.hpp"
 
-Rectangle::Rectangle(Point center, int w, int h,
-                     Fl_Color fillColor,
-                     Fl_Color frameColor):
-  center{center}, w{w}, h{h}, frameColor{frameColor}, fillColor{fillColor} {}
+Square::Square (Fl_Boxtype b, int x, int y, int w, int h, const char *l, Fl_Color color) :
+    Fl_Box (b, x, y, w, h, l)
+{} //center{x, y}, w{w}, h{h}{}
 
-void Rectangle::draw() {
-  fl_draw_box(FL_FLAT_BOX, center.x-w/2, center.y-h/2, w, h, fillColor);
-  fl_draw_box(FL_BORDER_FRAME, center.x-w/2, center.y-h/2, w, h, frameColor);
+
+
+bool Square::contains (Point p) const
+{
+  return p.x >= x () &&
+         p.x < x () + w () &&
+         p.y >= y () &&
+         p.y < y () + h ();
 }
-
-void Rectangle::setFillColor(Fl_Color newFillColor) {
-  fillColor = newFillColor;
-}
-
-void Rectangle::setFrameColor(Fl_Color newFrameColor) {
-  frameColor = newFrameColor;
-}
-
-bool Rectangle::contains(Point p) {
-  return p.x>=center.x-w/2 &&
-         p.x<center.x+w/2 &&
-         p.y>=center.y-h/2 &&
-         p.y<center.y+h/2;
+Point Square::get_position () const
+{
+  return {x (), y ()};
 }
