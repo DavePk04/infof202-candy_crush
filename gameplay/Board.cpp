@@ -195,8 +195,8 @@ int main(){
     // bd.swap(Point{2,7}, Point{3,7});
     // bd.swap(Point{4,4}, Point{4,5});
     // bd.swap(Point{1,0}, Point{1,1});
-    printf("-----------\n");
-    bd.swap(Point{7,1}, Point{8,1});
+    //printf("-----------\n");
+    //bd.swap(Point{7,1}, Point{8,1});
     //bd.swap(Point{2,6}, Point{3,6});
     // bd.swap(Point{8,8}, Point{8,7});
     // vector<Point> vector1 = {Point{8,0}, Point{8,1}, Point{8,2}};

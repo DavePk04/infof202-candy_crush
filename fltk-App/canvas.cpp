@@ -59,7 +59,7 @@ void Canvas::mouseClick(Point mouseLoc) {
     for (auto &c: v)
     {
         c.mouseClick(mouseLoc);
-        check(&c);
+        swim(&c);
     }
 }
 
@@ -68,16 +68,6 @@ void Canvas::keyPressed(int keyCode) {
     case 'q':
       exit(0);
   }
-}
-
-
-void Canvas::update ()
-{
-    Point save_center{selected_cells[0]->get_center().x, selected_cells[0]->get_center().y};
-    selected_cells[0]->reposition(selected_cells[1]->get_center());
-    selected_cells[0]->set_center(selected_cells[1]->get_center());
-    selected_cells[1]->reposition(save_center);
-    selected_cells[1]->set_center(save_center);
 }
 
 void Canvas::check (Cell * c)
@@ -97,10 +87,54 @@ void Canvas::check (Cell * c)
         int j1 = (p1.y-25)/50;
         int i2 = (p2.x-25)/50;
         int j2 = (p2.y-25)/50;
-        
-        update();
+        cout << "i1,j1 = (" << i1 << "," << j1 << ")" << endl;
+        cout << "i2,j2 = (" << i2 << "," << j2 << ")" << endl;
+        //swap(c1, c2);
+        swap_(cells[i1][j1], cells[i2][j2]);
         std::swap(cells[i1][j1], cells[i2][j2]);
         selected_cells.clear();
 
+    }
+}
+
+
+void Canvas::swap(Cell *c1, Cell *c2){
+    Point save_center{c1->get_center().x, c1->get_center().y};
+    c1->reposition(c2->get_center());
+    c1->set_center(c2->get_center());
+    c2->reposition(save_center);
+    c2->set_center(save_center);
+}
+
+void Canvas::swap_(Cell &c1, Cell &c2){
+    Point save_center{c1.get_center().x, c1.get_center().y};
+    c1.reposition(c2.get_center());
+    c1.set_center(c2.get_center());
+    c2.reposition(save_center);
+    c2.set_center(save_center);
+}
+
+void Canvas::swim(Cell *c){
+    if (c->is_selected()){
+      if (find (selected_cells.begin (), selected_cells.end (), c) == selected_cells.end ())
+        selected.push_back (c);
+      c->unselect ();
+    }
+
+    if (selected.size() == 1)
+    {
+        int x = (selected[0]->get_center().x-25)/50;
+        int y = (selected[0]->get_center().y-25)/50;
+        int i = y-1;
+        int j = 0;
+        while (i >= 0 && x >= 0)
+        {
+            swap_(cells[x][y], cells[x][i]);
+            std::swap(cells[x][y], cells[x][i]);
+            i--;
+            y--;
+            j++;
+        }
+        selected.clear();
     }
 }
