@@ -59,7 +59,7 @@ void Canvas::mouseClick(Point mouseLoc) {
     for (auto &c: v)
     {
         c.mouseClick(mouseLoc);
-        swim(&c);
+        delete_(&c);
     }
 }
 
@@ -68,6 +68,13 @@ void Canvas::keyPressed(int keyCode) {
     case 'q':
       exit(0);
   }
+}
+
+Fl_Color Canvas::generateColor(){
+    Fl_Color colors[6] = {FL_RED, FL_YELLOW, FL_GREEN, FL_BLUE, FL_CYAN, FL_MAGENTA};
+    int randomColor = rand() % 6;
+    cout << randomColor << endl;
+    return colors[randomColor];
 }
 
 void Canvas::check (Cell * c)
@@ -87,10 +94,10 @@ void Canvas::check (Cell * c)
         int j1 = (p1.y-25)/50;
         int i2 = (p2.x-25)/50;
         int j2 = (p2.y-25)/50;
-        cout << "i1,j1 = (" << i1 << "," << j1 << ")" << endl;
-        cout << "i2,j2 = (" << i2 << "," << j2 << ")" << endl;
-        //swap(c1, c2);
-        swap_(cells[i1][j1], cells[i2][j2]);
+        // cout << "i1,j1 = (" << i1 << "," << j1 << ")" << endl;
+        // cout << "i2,j2 = (" << i2 << "," << j2 << ")" << endl;
+        // swap_(cells[i1][j1], cells[i2][j2]);
+        swap(c1, c2);
         std::swap(cells[i1][j1], cells[i2][j2]);
         selected_cells.clear();
 
@@ -115,8 +122,23 @@ void Canvas::swap_(Cell &c1, Cell &c2){
 }
 
 void Canvas::swim(Cell *c){
+    int x = (selected[0]->get_center().x-25)/50;
+    int y = (selected[0]->get_center().y-25)/50;
+    int i = y-1;
+    int j = 0;
+    while (i >= 0 && y >= 0)
+    {
+        swap_(cells[x][y], cells[x][i]);
+        std::swap(cells[x][y], cells[x][i]);
+        i--;
+        y--;
+        j++;
+    }
+}
+
+void Canvas::delete_(Cell *c){
     if (c->is_selected()){
-      if (find (selected_cells.begin (), selected_cells.end (), c) == selected_cells.end ())
+      if (find (selected.begin (), selected.end (), c) == selected.end ())
         selected.push_back (c);
       c->unselect ();
     }
@@ -124,17 +146,10 @@ void Canvas::swim(Cell *c){
     if (selected.size() == 1)
     {
         int x = (selected[0]->get_center().x-25)/50;
-        int y = (selected[0]->get_center().y-25)/50;
-        int i = y-1;
-        int j = 0;
-        while (i >= 0 && x >= 0)
-        {
-            swap_(cells[x][y], cells[x][i]);
-            std::swap(cells[x][y], cells[x][i]);
-            i--;
-            y--;
-            j++;
-        }
+        int y = 0;
+        Fl_Color color = generateColor();
+        c->destroy(color);
+        swim(c);
         selected.clear();
     }
 }

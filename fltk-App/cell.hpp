@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <mutex>
 #include "square.hpp"
 
 
@@ -36,5 +37,6 @@ class Cell {
   void reposition(Point p);
   Point get_center() const;
   void set_center(Point new_center);
+  void destroy(Fl_Color color_);
 
 };

@@ -56,7 +56,7 @@ void Cell::reposition (Point p)
 {
   int x = p.x;
   int y = p.y;
-  cout << "(" << x << "," << y << endl;
+  //cout << "(" << x << "," << y << endl;
   square->position (x,y);
   square->redraw();
 }
@@ -74,4 +74,12 @@ void Cell::unselect ()
 Point Cell::get_center() const
 {
   return center;
+}
+
+void Cell::destroy(Fl_Color color_){
+  //mutex lock;
+  //lock.lock();
+  set_color(color_);
+  square->color(color_);
+  //lock.unlock();
 }
