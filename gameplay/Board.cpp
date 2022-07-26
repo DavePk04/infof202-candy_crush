@@ -2,81 +2,71 @@
 using namespace std;
 
 
-void Board::control_generation (int x, int y)
+vector<int> delete_ele(vector<int> vec, int num)
 {
-  int color = colors_grid[x][y];
-  int col = 0;
-  int row = 0;
-  std::vector<int> color_vect{1,2,3,4,5,6};
-  int new_color = color;
+  // initializing a reverse iterator
+  vector<int>::reverse_iterator itr1;
 
-  // horizontal vers la droite
-  int i = x + 1;
-  while (i < 9 && color == colors_grid[i][y])
-    {
-      col++;
-      i++;
-    }
+  for (itr1 = vec.rbegin(); itr1 < vec.rend(); itr1++) {
 
-  // horizontal vers la gauche
-  i = x;
-  while (i >= 0 && color == colors_grid[i][y])
-    {
-      col++;
-      i--;
-    }
+      if (*itr1 == num) {
 
-  // vertical vers le haut
-  int j = y + 1;
-  while (j < 9 && color == colors_grid[x][j])
-    {
-      row++;
-      j++;
-    }
-
-  // vertical vers le bas
-  j = y;
-  while (j >= 0 && color == colors_grid[x][j])
-    {
-      if (color == colors_grid[x][j])
-        {
-          row++;
-          j--;
+//          printf ("élément à supprimer = %i \n", num);
+          vec.erase((itr1 + 1).base());
         }
     }
 
-  if (col > 2 || row > 2)
-    {
-      while (color == new_color)
-        new_color = color_vect[rand () % color_vect.size ()];
-      colors_grid[x][y] = new_color;
-    }
-
+  return vec;
 }
+
+
+int Board::GetColorAt(int col, int line)
+{
+  if (col < 0 || col >= GRID_DIMENSION
+      ||  line < 0 ||  line >= GRID_DIMENSION)
+    return -1;
+
+  auto color = board[line][col];
+
+  return color;
+}
+
 
 void Board::gen_color_grid ()
 {
-  for (int i = 0; i < 9; i++)
+  std::vector<int> color_vect{1,2,3,4,5,6};
+  for (int i = 0; i < GRID_DIMENSION; i++)
     {
-      colors_grid.emplace_back ();
-      for (int j = 0; j < 9; j++)
+      std::vector<int> copy_color_vect(color_vect);
+      board[i] = new int[GRID_DIMENSION];
+      for (int j = 0; j <= GRID_DIMENSION; j++)
         {
-          std::vector<int> color_vect{1,2,3,4,5,6};
-          int color = color_vect[rand () % color_vect.size ()];
-          colors_grid[i].push_back (color);
+          int left1 = GetColorAt(j - 1, i); //2
+          int left2 = GetColorAt(j - 2, i);
+          if (left2 != -1 && left1 == left2) // 3
+          {
+            copy_color_vect = delete_ele (copy_color_vect, left1);
+          }
+
+          int down1 = GetColorAt(j, i - 1); // 5
+          int down2 = GetColorAt(j, i - 2);
+          if (down2 != -1 && down1 == down2)
+          {
+              copy_color_vect = delete_ele (copy_color_vect, down1);
+          }
+
+          int color = copy_color_vect[rand () % copy_color_vect.size ()];
+          board[i][j] = color;
         }
     }
 
-  for (int i = 0; i < 9; i++)
-    for (int j = 0; j < 9; j++)
-      control_generation (i, j);
 }
 
 void print_board(int** data)
 {
-    for (int x = 0; x < 9; x++)
+    for (int x = 0; x < GRID_DIMENSION; x++)
     {
-        for (int y = 0; y < 9; y++)
+        for (int y = 0; y < GRID_DIMENSION; y++)
         {
             printf(" %d", data[x][y]);       
         }
@@ -86,14 +76,7 @@ void print_board(int** data)
 }
 
 Board::Board() {
-    for (int i = 0; i < ROW; i++)
-    {   
-        board[i] = new int[ROW];
-        for (int j = 0; j <= COL; j++)
-        {
-            board[i][j] = rand()%TOTALCOLOR + 1;  //Generate number between 1 to 6
-        } 
-    }  
+    gen_color_grid();
 }
 
 
@@ -102,62 +85,57 @@ int** Board::getBoard() {
 }
 
 bool Board::is_inBoard(Point pos) { 
-    return (0 <= pos.x and pos.x < ROW && 0 <= pos.y && pos.y < COL); 
+    return (0 <= pos.x and pos.x < GRID_DIMENSION && 0 <= pos.y && pos.y < GRID_DIMENSION);
 }
 
 
 /**
 * Check if the wanted swap create alignment of identical candies
 */
-bool Board::is_validSwap(Point ori, Point target) { 
-    int Hcount = 1;
-    int Vcount = 1; 
-    aligned_candies_H.push_back(target);
-    aligned_candies_V.push_back(target);
-    int targetNbr = board[target.x][target.y];
-    int j = 0;
-    for (auto &i: DIR){
-        Point new_target = target + i;
-        while (new_target.x > 0 && new_target.y > 0 && new_target.x < COL && new_target.y < COL && board[new_target.x][new_target.y] == targetNbr && Vcount <= MIN_CANDIES_ALIGNED && Hcount <= MIN_CANDIES_ALIGNED)
+bool Board::is_validSwap(Point origine, Point target) {
+
+    int OrigineColor = board[origine.x][origine.y];
+    for (auto &shift: DIR){
+        Point new_target = target + shift;
+        aligned_candies_H.clear();
+        aligned_candies_V.clear();
+        aligned_candies_H.push_back(origine);
+        aligned_candies_V.push_back(origine);
+        while (new_target.x > 0 && new_target.y > 0 && new_target.x < GRID_DIMENSION && new_target.y < GRID_DIMENSION
+               && board[new_target.x][new_target.y] == OrigineColor && aligned_candies_V.size() <= MIN_CANDIES_ALIGNED && aligned_candies_H.size() <= MIN_CANDIES_ALIGNED)
         {
-            if (i.x==0) {  // DIR verticales
-                aligned_candies_V.push_back(new_target);
-                Vcount++;
+            if (shift.x==0) {  // DIR verticales
+                aligned_candies_H.push_back(new_target);
             }
             else{
-                aligned_candies_H.push_back(new_target);
-                Hcount++;
+                aligned_candies_V.push_back(new_target);
             }  
-            new_target = new_target + i;   
+            new_target = new_target + shift;
         }
-        j++;
+        printf ("V = %s and H = %s\n", to_string(aligned_candies_V.size()).c_str(), to_string(aligned_candies_H.size()).c_str());
     }
-    return !(ori == target) && (Vcount >= MIN_CANDIES_ALIGNED || Hcount >= MIN_CANDIES_ALIGNED);  // none swap between two candies with same color
+    return !(origine == target) && (aligned_candies_H.size() >= MIN_CANDIES_ALIGNED || aligned_candies_V.size() >= MIN_CANDIES_ALIGNED);  // none swap between two candies with same color
 }
 
 
 /**
 * method called when a swap is done 
 */
-void Board::swap(Point ori, Point target) {
-    int nbr = board[target.x][target.y];
-    board[target.x][target.y] = board[ori.x][ori.y];
-    board[ori.x][ori.y] = nbr;
-
-    if (!is_validSwap(ori, target))
+void Board::swap(Point cell_1, Point cell_2) {
+    if (is_validSwap(cell_1, cell_2))
     {
-        int nbr2 = board[ori.x][ori.y];
-        board[ori.x][ori.y] = board[target.x][target.y];
-        board[target.x][target.y] = nbr;
+        printf ("VALIDE\n");
+        int nbr = board[cell_2.x][cell_2.y];
+        board[cell_2.x][cell_2.y] = board[cell_1.x][cell_1.y];
+        board[cell_1.x][cell_1.y] = nbr;
+        print_board(board);
+        delete_candies(aligned_candies_H);
+        delete_candies(aligned_candies_V);
+        printf("-----------\n");
+        print_board(board);
+        aligned_candies_H.clear();
+        aligned_candies_V.clear();
     }
-    
-    print_board(board);
-    delete_candies(aligned_candies_H);
-    delete_candies(aligned_candies_V);
-    printf("-----------\n");
-    print_board(board);
-    aligned_candies_H.clear();
-    aligned_candies_V.clear();
 }
 
 /**
@@ -190,12 +168,12 @@ int main(){
     int** board = bd.getBoard();
     print_board(board);
     printf("-----------\n");
-    // bd.swap(Point{4,1}, Point{5,1});
-    // printf("-----------\n");
-    // bd.swap(Point{2,7}, Point{3,7});
+//     bd.swap(Point{0,6}, Point{0,5});
+//     printf("-----------\n");
+     bd.swap(Point{0,6}, Point{1,6});
     // bd.swap(Point{4,4}, Point{4,5});
     // bd.swap(Point{1,0}, Point{1,1});
-    //printf("-----------\n");
+    printf("-----------\n");
     //bd.swap(Point{7,1}, Point{8,1});
     //bd.swap(Point{2,6}, Point{3,6});
     // bd.swap(Point{8,8}, Point{8,7});

@@ -2,7 +2,7 @@
 
 class Canvas {
   vector<vector<Cell>> cells;
-  int** board = new int*[COL];
+  int** board = new int*[GRID_DIMENSION];
   vector<Cell*> selected_cells;
   vector<Cell*> selected;
  public:

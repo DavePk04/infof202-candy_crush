@@ -3,36 +3,36 @@
 #include <algorithm>
 
 Canvas::Canvas() {
-    for (int i = 0; i < ROW; i++)
+    for (int i = 0; i < GRID_DIMENSION; i++)
     {   
-        board[i] = new int[ROW];
-        for (int j = 0; j <= COL; j++)
+        board[i] = new int[GRID_DIMENSION];
+        for (int j = 0; j <= GRID_DIMENSION; j++)
         {
             board[i][j] = rand()%TOTALCOLOR + 1;  //Generate number between 1 to 6
         } 
     }  
 
-    for (int x = 0; x<ROW; x++) {
+    for (int x = 0; x<GRID_DIMENSION; x++) {
         cells.push_back({});
-        for (int y = 0; y<COL; y++){
+        for (int y = 0; y<GRID_DIMENSION; y++){
             switch (board[x][y])
             {
-            case COLOR1:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_RED});
-                break;
-            case COLOR2:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_YELLOW});
-                break;
-            case COLOR3:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_GREEN});
-                break;
-            case COLOR4:
+            case BLUE:
                 cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_BLUE});
                 break;
-            case COLOR5:
+            case RED:
+                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_RED});
+                break;
+            case GREEN:
+                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_GREEN});
+                break;
+            case YELLOW:
+                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_YELLOW});
+                break;
+            case CYAN:
                 cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_CYAN});
                 break;
-            case COLOR6:
+            case MAGENTA:
                 cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_MAGENTA});
                 break;
             }
