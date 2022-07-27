@@ -28,7 +28,10 @@ class Board
         void swim(Point p);
 		void control_generation (int x, int y);
 		void gen_color_grid ();
-        int GetColorAt (int colomn, int line);
+        int GetColorAt (int colomn, int row);
+  bool CheckMatches ();
+  vector<Point> FindColumnMatchForCell (int col, int row, int color);
+  vector<Point> FindRowMatchForCell (int row, int col, int color);
 };
 
 #endif // __BOARD_H__

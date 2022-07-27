@@ -1,4 +1,8 @@
 #include "Board.hpp"
+#include <algorithm>
+#include <unordered_set>
+#include<set>
+
 using namespace std;
 
 
@@ -20,13 +24,13 @@ vector<int> delete_ele(vector<int> vec, int num)
 }
 
 
-int Board::GetColorAt(int col, int line)
+int Board::GetColorAt(int row, int col)
 {
   if (col < 0 || col >= GRID_DIMENSION
-      ||  line < 0 ||  line >= GRID_DIMENSION)
+      || row < 0 || row >= GRID_DIMENSION)
     return -1;
 
-  auto color = board[line][col];
+  auto color = board[row][col];
 
   return color;
 }
@@ -41,15 +45,15 @@ void Board::gen_color_grid ()
       board[i] = new int[GRID_DIMENSION];
       for (int j = 0; j <= GRID_DIMENSION; j++)
         {
-          int left1 = GetColorAt(j - 1, i); //2
-          int left2 = GetColorAt(j - 2, i);
+          int left1 = GetColorAt(i, j - 1); //2
+          int left2 = GetColorAt(i, j - 2);
           if (left2 != -1 && left1 == left2) // 3
           {
             copy_color_vect = delete_ele (copy_color_vect, left1);
           }
 
-          int down1 = GetColorAt(j, i - 1); // 5
-          int down2 = GetColorAt(j, i - 2);
+          int down1 = GetColorAt(i - 1, j); // 5
+          int down2 = GetColorAt(i - 2, j);
           if (down2 != -1 && down1 == down2)
           {
               copy_color_vect = delete_ele (copy_color_vect, down1);
@@ -118,24 +122,106 @@ bool Board::is_validSwap(Point origine, Point target) {
 }
 
 
+vector<Point> Board::FindColumnMatchForCell(int row, int col, int color)
+{
+  vector<Point> result;
+  for (int i = col + 1; i < GRID_DIMENSION; i++)
+    {
+      int nextColumnColor = GetColorAt(row, i);
+      if (nextColumnColor != color)
+        {
+          break;
+        }
+      result.push_back({row,i});
+    }
+  return result;
+}
+
+
+vector<Point> Board::FindRowMatchForCell(int row, int col, int color)
+{
+  vector<Point> result;
+  for (int i = row + 1; i < GRID_DIMENSION; i++)
+    {
+      int nextRowColor = GetColorAt(i, col);
+      if (nextRowColor != color)
+        {
+          break;
+        }
+      result.push_back({i, col});
+    }
+  return result;
+}
+
+
+bool Board::CheckMatches(){
+
+  vector<Point> matchedCells;
+
+  for (int row = 0; row < GRID_DIMENSION; row++)
+    {
+      for (int col = 0; col < GRID_DIMENSION; col++)
+        {
+          int currentColor = GetColorAt (row, col);
+
+          aligned_candies_H = FindColumnMatchForCell(row, col, currentColor);
+
+          if (aligned_candies_H.size() >= 2)
+            {
+              for(auto alignedcell: aligned_candies_H)
+                {
+                  if (count (matchedCells.begin(), matchedCells.end(), alignedcell) == 0)
+                    matchedCells.push_back(alignedcell);
+                }
+              Point to_store{row, col};
+              if (count (matchedCells.begin(), matchedCells.end(), to_store) == 0)
+                matchedCells.push_back(to_store);
+            }
+
+          aligned_candies_V = FindRowMatchForCell(row, col, currentColor);
+
+          if (aligned_candies_V.size() >= 2)
+            {
+              for(auto alignedcell: aligned_candies_V)
+                {
+                  if (count (matchedCells.begin(), matchedCells.end(), alignedcell) == 0)
+                    matchedCells.push_back(alignedcell);
+                }
+
+              Point to_store{row, col};
+              if (count (matchedCells.begin(), matchedCells.end(), to_store) == 0)
+                matchedCells.push_back(to_store); // 5
+            }
+        }
+    }
+
+    for(auto CellToDelete:matchedCells)
+      board[CellToDelete.x][CellToDelete.y] = -1;
+
+  return matchedCells.size() > 0;
+
+}
+
+
 /**
 * method called when a swap is done 
 */
 void Board::swap(Point cell_1, Point cell_2) {
-    if (is_validSwap(cell_1, cell_2))
+
+  int tmp = board[cell_2.x][cell_2.y];
+  board[cell_2.x][cell_2.y] = board[cell_1.x][cell_1.y];
+  board[cell_1.x][cell_1.y] = tmp;
+
+  bool changesOccurs = CheckMatches();
+
+  if(!changesOccurs)
     {
-        printf ("VALIDE\n");
-        int nbr = board[cell_2.x][cell_2.y];
-        board[cell_2.x][cell_2.y] = board[cell_1.x][cell_1.y];
-        board[cell_1.x][cell_1.y] = nbr;
-        print_board(board);
-        delete_candies(aligned_candies_H);
-        delete_candies(aligned_candies_V);
-        printf("-----------\n");
-        print_board(board);
-        aligned_candies_H.clear();
-        aligned_candies_V.clear();
+      tmp = board[cell_1.x][cell_1.y];
+      board[cell_1.x][cell_1.y] = board[cell_2.x][cell_2.y];
+      board[cell_2.x][cell_2.y] = tmp;
     }
+
+  print_board(board);
 }
 
 /**
