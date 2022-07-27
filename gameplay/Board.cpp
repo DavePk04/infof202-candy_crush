@@ -38,10 +38,9 @@ int Board::GetColorAt(int row, int col)
 
 void Board::gen_color_grid ()
 {
-  std::vector<int> color_vect{1,2,3,4,5,6};
   for (int i = 0; i < GRID_DIMENSION; i++)
     {
-      std::vector<int> copy_color_vect(color_vect);
+      std::vector<int> copy_color_vect(COLORS_VECT);
       board[i] = new int[GRID_DIMENSION];
       for (int j = 0; j <= GRID_DIMENSION; j++)
         {
@@ -94,34 +93,12 @@ bool Board::is_inBoard(Point pos) {
 
 
 /**
-* Check if the wanted swap create alignment of identical candies
-*/
-bool Board::is_validSwap(Point origine, Point target) {
-
-    int OrigineColor = board[origine.x][origine.y];
-    for (auto &shift: DIR){
-        Point new_target = target + shift;
-        aligned_candies_H.clear();
-        aligned_candies_V.clear();
-        aligned_candies_H.push_back(origine);
-        aligned_candies_V.push_back(origine);
-        while (new_target.x > 0 && new_target.y > 0 && new_target.x < GRID_DIMENSION && new_target.y < GRID_DIMENSION
-               && board[new_target.x][new_target.y] == OrigineColor && aligned_candies_V.size() <= MIN_CANDIES_ALIGNED && aligned_candies_H.size() <= MIN_CANDIES_ALIGNED)
-        {
-            if (shift.x==0) {  // DIR verticales
-                aligned_candies_H.push_back(new_target);
-            }
-            else{
-                aligned_candies_V.push_back(new_target);
-            }  
-            new_target = new_target + shift;
-        }
-        printf ("V = %s and H = %s\n", to_string(aligned_candies_V.size()).c_str(), to_string(aligned_candies_H.size()).c_str());
-    }
-    return !(origine == target) && (aligned_candies_H.size() >= MIN_CANDIES_ALIGNED || aligned_candies_V.size() >= MIN_CANDIES_ALIGNED);  // none swap between two candies with same color
-}
-
-
+ * This function select Matched cells by Colomn
+ * @param row
+ * @param col
+ * @param color
+ * @return
+ */
 vector<Point> Board::FindColumnMatchForCell(int row, int col, int color)
 {
   vector<Point> result;
@@ -138,6 +115,13 @@ vector<Point> Board::FindColumnMatchForCell(int row, int col, int color)
 }
 
 
+/**
+ * This function select Matched cells by Row
+ * @param row
+ * @param col
+ * @param color
+ * @return
+ */
 vector<Point> Board::FindRowMatchForCell(int row, int col, int color)
 {
   vector<Point> result;
@@ -154,6 +138,9 @@ vector<Point> Board::FindRowMatchForCell(int row, int col, int color)
 }
 
 
+/**
+ * This function is used to check if a match appear after a swap
+ */
 bool Board::CheckMatches(){
 
   vector<Point> matchedCells;
@@ -202,6 +189,26 @@ bool Board::CheckMatches(){
 
 }
 
+/**
+ * This function drop cells and generate new ones
+ */
+void Board::FillGrid(){
+  for (int col = 0; col < GRID_DIMENSION; col++)
+    {
+      for (int row = 0; row < GRID_DIMENSION; row++)
+        {
+          while (GetColorAt (row, col) == -1) {
+              for (int toFill = row; toFill > 0; toFill--)
+                {
+                  board[toFill][col] = GetColorAt (toFill-1,col);
+                }
+
+              board[0][col] = COLORS_VECT[rand() % TOTALCOLOR];
+          }
+        }
+    }
+}
+
 
 /**
 * method called when a swap is done 
@@ -220,34 +227,18 @@ void Board::swap(Point cell_1, Point cell_2) {
       board[cell_1.x][cell_1.y] = board[cell_2.x][cell_2.y];
       board[cell_2.x][cell_2.y] = tmp;
     }
+  else
+    {
+      do
+        {
+          FillGrid();
+        }
+      while (CheckMatches());
+    }
 
   print_board(board);
 }
 
-/**
-* reorganization upwards
-*/
-void Board::swim(Point p){
-    int x = p.x;
-    int y = p.y;
-    board[x][y] = CANDY_DELETED;    // replace deleted candy by random candy (=rand()%TOTALCOLOR + 1)
-    int i=x-1;
-    while (i >= 0 && x >= 0){
-        int nbr = board[x][y];
-        board[x][y] = board[i][y];
-        board[i][y] = nbr;
-        i--;
-        x--;
-    }
-}
-
-void Board::delete_candies(vector<Point> targets){
-    if (targets.size() >= MIN_CANDIES_ALIGNED)
-    {
-        for(auto &t:targets)
-            swim(t);
-    }
-}
 
 int main(){
     Board bd;
@@ -257,7 +248,8 @@ int main(){
 //     bd.swap(Point{0,6}, Point{0,5});
 //     printf("-----------\n");
      bd.swap(Point{0,6}, Point{1,6});
-    // bd.swap(Point{4,4}, Point{4,5});
+  printf("-----------\n");
+     bd.swap(Point{2,7}, Point{2,6});
     // bd.swap(Point{1,0}, Point{1,1});
     printf("-----------\n");
     //bd.swap(Point{7,1}, Point{8,1});

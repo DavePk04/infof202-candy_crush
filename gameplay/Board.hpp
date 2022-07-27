@@ -32,6 +32,7 @@ class Board
   bool CheckMatches ();
   vector<Point> FindColumnMatchForCell (int col, int row, int color);
   vector<Point> FindRowMatchForCell (int row, int col, int color);
+  void FillGrid ();
 };
 
 #endif // __BOARD_H__
