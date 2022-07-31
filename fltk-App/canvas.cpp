@@ -3,37 +3,29 @@
 #include <algorithm>
 
 Canvas::Canvas() {
-    for (int i = 0; i < GRID_DIMENSION; i++)
-    {   
-        board[i] = new int[GRID_DIMENSION];
-        for (int j = 0; j <= GRID_DIMENSION; j++)
-        {
-            board[i][j] = rand()%TOTALCOLOR + 1;  //Generate number between 1 to 6
-        } 
-    }  
-
+    board = bd.getBoard();
     for (int x = 0; x<GRID_DIMENSION; x++) {
         cells.push_back({});
         for (int y = 0; y<GRID_DIMENSION; y++){
             switch (board[x][y])
             {
             case BLUE:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_BLUE});
+                cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_BLUE});
                 break;
             case RED:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_RED});
+                cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_RED});
                 break;
             case GREEN:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_GREEN});
+                cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_GREEN});
                 break;
             case YELLOW:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_YELLOW});
+                cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_YELLOW});
                 break;
             case CYAN:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_CYAN});
+                cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_CYAN});
                 break;
             case MAGENTA:
-                cells[x].push_back({{50*x+25, 50*y+25}, 40, 40, FL_MAGENTA});
+                cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_MAGENTA});
                 break;
             }
         }
@@ -59,7 +51,8 @@ void Canvas::mouseClick(Point mouseLoc) {
     for (auto &c: v)
     {
         c.mouseClick(mouseLoc);
-        delete_(&c);
+        gamesession(&c);
+
     }
 }
 
@@ -70,6 +63,66 @@ void Canvas::keyPressed(int keyCode) {
   }
 }
 
+void Canvas::normalise(){
+    for (int x = 0; x < GRID_DIMENSION; x++)
+    {
+      for (int y = 0; y < GRID_DIMENSION; y++)
+        {
+            Cell c = cells[x][y];
+            switch (board[x][y])
+            {
+            case BLUE:
+                cells[x][y].change(FL_BLUE);
+                c.reposition(c.get_center());
+                break;
+            case RED:
+                cells[x][y].change(FL_RED);
+                c.reposition(c.get_center());
+                break;
+            case GREEN:
+                cells[x][y].change(FL_GREEN);
+                c.reposition(c.get_center());
+                break;
+            case YELLOW:
+                cells[x][y].change(FL_YELLOW);
+                c.reposition(c.get_center());
+                break;
+            case CYAN:
+                cells[x][y].change(FL_CYAN);
+                c.reposition(c.get_center());
+                break;
+            case MAGENTA:
+                cells[x][y].change(FL_MAGENTA);
+                c.reposition(c.get_center());
+                break;
+            }
+        }
+    }
+}
+
+void Canvas::gamesession(Cell *c){
+    if (c->is_selected()){
+      if (find (selected.begin (), selected.end (), c) == selected.end ())
+        selected.push_back (c);
+      c->unselect ();
+    }
+
+    if (selected.size() == 2)
+    {
+        Point p1 = Point{(selected[0]->get_center().x-25)/50, (selected[0]->get_center().y-25)/50};
+        Point p2 = Point{(selected[1]->get_center().x-25)/50, (selected[1]->get_center().y-25)/50};
+        p1 = p1.reverse();
+        p2 = p2.reverse();
+        cout << board[p1.x][p2.y] << endl;
+        if (bd.swaps(p1, p2))
+        {
+            normalise();
+        }
+        selected.clear();
+    }
+}
+
+/*
 Fl_Color Canvas::generateColor(){
     Fl_Color colors[6] = {FL_RED, FL_YELLOW, FL_GREEN, FL_BLUE, FL_CYAN, FL_MAGENTA};
     int randomColor = rand() % 6;
@@ -143,13 +196,14 @@ void Canvas::delete_(Cell *c){
       c->unselect ();
     }
 
-    if (selected.size() == 1)
+    if (selected.size() >= 1)
     {
         int x = (selected[0]->get_center().x-25)/50;
         int y = 0;
         Fl_Color color = generateColor();
-        c->destroy(color);
+        c->change(color);
         swim(c);
         selected.clear();
     }
 }
+*/

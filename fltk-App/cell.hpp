@@ -37,6 +37,6 @@ class Cell {
   void reposition(Point p);
   Point get_center() const;
   void set_center(Point new_center);
-  void destroy(Fl_Color color_);
+  void change(Fl_Color color_);
 
 };

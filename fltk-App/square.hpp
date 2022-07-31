@@ -2,7 +2,8 @@
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
 #include <iostream>
-#include "../gameplay/const.hpp"
+#include "Board.hpp"
+//#include "../gameplay/Board.hpp"
 using namespace std;
 
 

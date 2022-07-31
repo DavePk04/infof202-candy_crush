@@ -76,7 +76,7 @@ Point Cell::get_center() const
   return center;
 }
 
-void Cell::destroy(Fl_Color color_){
+void Cell::change(Fl_Color color_){
   //mutex lock;
   //lock.lock();
   set_color(color_);
