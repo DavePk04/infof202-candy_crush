@@ -6,6 +6,14 @@
 using namespace std;
 
 
+bool isvalidPos(Point point)
+{
+  if (point.x > -1 and point.x < GRID_DIMENSION and point.y > -1 and point.y < GRID_DIMENSION)
+    return true;
+
+  return false;
+}
+
 vector<int> delete_ele(vector<int> vec, int num)
 {
   // initializing a reverse iterator
@@ -30,7 +38,7 @@ int Board::GetColorAt(int row, int col)
       || row < 0 || row >= GRID_DIMENSION)
     return -1;
 
-  auto color = board[row][col];
+  auto color = _board[row][col];
 
   return color;
 }
@@ -41,7 +49,7 @@ void Board::gen_color_grid ()
   for (int i = 0; i < GRID_DIMENSION; i++)
     {
       std::vector<int> copy_color_vect(COLORS_VECT);
-      board[i] = new int[GRID_DIMENSION];
+      _board[i] = new int[GRID_DIMENSION];
       for (int j = 0; j <= GRID_DIMENSION; j++)
         {
           int left1 = GetColorAt(i, j - 1); //2
@@ -59,7 +67,7 @@ void Board::gen_color_grid ()
           }
 
           int color = copy_color_vect[rand () % copy_color_vect.size ()];
-          board[i][j] = color;
+          _board[i][j] = color;
         }
     }
 
@@ -84,7 +92,7 @@ Board::Board() {
 
 
 int** Board::getBoard() {
-    return board;
+    return _board;
 }
 
 bool Board::is_inBoard(Point pos) { 
@@ -152,11 +160,11 @@ bool Board::CheckMatches(){
         {
           int currentColor = GetColorAt (row, col);
 
-          aligned_candies_H = FindColumnMatchForCell(row, col, currentColor);
+          _aligned_candies_H = FindColumnMatchForCell(row, col, currentColor);
 
-          if (aligned_candies_H.size() >= 2)
+          if (_aligned_candies_H.size() >= 2)
             {
-              for(auto alignedcell: aligned_candies_H)
+              for(auto alignedcell: _aligned_candies_H)
                 {
                   if (count (matchedCells.begin(), matchedCells.end(), alignedcell) == 0)
                     matchedCells.push_back(alignedcell);
@@ -166,11 +174,11 @@ bool Board::CheckMatches(){
                 matchedCells.push_back(to_store);
             }
 
-          aligned_candies_V = FindRowMatchForCell(row, col, currentColor);
+          _aligned_candies_V = FindRowMatchForCell(row, col, currentColor);
 
-          if (aligned_candies_V.size() >= 2)
+          if (_aligned_candies_V.size() >= 2)
             {
-              for(auto alignedcell: aligned_candies_V)
+              for(auto alignedcell: _aligned_candies_V)
                 {
                   if (count (matchedCells.begin(), matchedCells.end(), alignedcell) == 0)
                     matchedCells.push_back(alignedcell);
@@ -184,15 +192,15 @@ bool Board::CheckMatches(){
     }
 
   for(auto CellToDelete:matchedCells)
-      board[CellToDelete.x][CellToDelete.y] = -1;
+    _board[CellToDelete.x][CellToDelete.y] = -1;
 
   if (matchedCells.size() > 3)
     {
       auto last = matchedCells.back();
-      board[last.x][last.y] = -2;
+      _board[last.x][last.y] = -2;
     }
 
-  mscore += int(matchedCells.size());
+  _score += int(matchedCells.size());
 
   return matchedCells.size() > 0;
 
@@ -211,13 +219,13 @@ void Board::FillGrid(){
               {
                 for (int toFill = row; toFill > 0; toFill--)
                   {
-                    board[toFill][col] = GetColorAt (toFill-1,col);
+                    _board[toFill][col] = GetColorAt (toFill - 1, col);
                   }
 
-                board[0][col] = COLORS_VECT[rand() % TOTALCOLOR];
+                _board[0][col] = COLORS_VECT[rand() % TOTALCOLOR];
               }
 
-            else board[row][col] = 8;
+            else _board[row][col] = 8;
 
           }
         }
@@ -229,35 +237,55 @@ void Board::FillGrid(){
 * method called when a swap is done
 */
 bool Board::swaps(Point cell_1, Point cell_2) {
-  print_board(board);
+  print_board(_board);
   cout << GetScore() << endl;
   std::cout << "-----" << std::endl;
-  int tmp = board[cell_2.x][cell_2.y];
-  board[cell_2.x][cell_2.y] = board[cell_1.x][cell_1.y];
-  board[cell_1.x][cell_1.y] = tmp;
+  bool bombastic = false;
+  int tmp = _board[cell_2.x][cell_2.y];
+  _board[cell_2.x][cell_2.y] = _board[cell_1.x][cell_1.y];
+  _board[cell_1.x][cell_1.y] = tmp;
 
   bool changesOccurs = CheckMatches();
-  if(!changesOccurs)
+
+  if (_board[cell_1.x][cell_1.y] == 8 )
     {
-      tmp = board[cell_1.x][cell_1.y];
-      board[cell_1.x][cell_1.y] = board[cell_2.x][cell_2.y];
-      board[cell_2.x][cell_2.y] = tmp;
+      bomb (cell_1);
+      bombastic = true;
+    }
+  else if (_board[cell_2.x][cell_2.y] == 8)
+    {
+      bomb (cell_2);
+      bombastic = true;
+    }
+
+  if(!changesOccurs and !bombastic)
+    {
+      tmp = _board[cell_1.x][cell_1.y];
+      _board[cell_1.x][cell_1.y] = _board[cell_2.x][cell_2.y];
+      _board[cell_2.x][cell_2.y] = tmp;
     }
   else
     {
-      mnummoves --;
+      _nummoves --;
       do
         {
           FillGrid();
+          identifypossibleswap();
+//          for (int i = 0; i < _possibleswap.size() ; i++)
+//            {
+//              cout << _possibleswap.at (i).first.x << _possibleswap.at (i).first.y << " and "
+//              << _possibleswap.at (i).second.x << _possibleswap.at (i).second.y << endl;
+//            }
+
         }
       while (CheckMatches());
-      if (mnummoves <= 0)
+      if (_nummoves <= 0)
         {
-          mnummoves = 0;
+          _nummoves = 0;
           //GameOver status
         }
     }
-  print_board(board);
+  print_board(_board);
 
   return changesOccurs;
 }
@@ -265,25 +293,25 @@ bool Board::swaps(Point cell_1, Point cell_2) {
 
 int Board::GetScore ()
 {
-  return mscore;
+  return _score;
 }
 
 
 void Board::SetScore (int newscore)
 {
-  mscore = newscore;
+  _score = newscore;
 }
 
 
 int Board::GetNumMoves ()
 {
-  return mnummoves;
+  return _nummoves;
 }
 
 
 void Board::SetNumMoves (int numMoves)
 {
-  mnummoves = numMoves;
+  _nummoves = numMoves;
 }
 
 
@@ -295,10 +323,81 @@ void Board::bomb (Point bombpos)
     explosion.push_back (bombpos+dir);
 
   for(auto CellToDelete:explosion)
-    board[CellToDelete.x][CellToDelete.y] = -1;
+    if (isvalidPos (CellToDelete))
+      {
+        _board[CellToDelete.x][CellToDelete.y] = -1;
+        _score += 1;
+      }
 
-  FillGrid();
+
+//  FillGrid();
 }
+
+
+void Board::addSwap (Point Source, Point Destination)
+{
+  pair<Point, Point> to_add{Source, Destination};
+  if (count (_possibleswap.begin(), _possibleswap.end(), to_add) == 0)
+    _possibleswap.push_back({Source, Destination});
+}
+
+
+void Board::identifypossibleswap ()
+{
+  _possibleswap.clear();
+  // #TODO REVISION
+  for (int row = 0; row < GRID_DIMENSION; row++)
+    {
+      for (int col = 0; col < GRID_DIMENSION; col++)
+        {
+          if (_board[row][col] != -1)
+            {
+              for(auto dir : DIR)
+                {
+                  Point destination{row+dir.x, col+dir.y};
+                  if (isvalidPos (destination))
+                    {
+                      if (_board[row][col] == 8 or _board[destination.x][destination.y] == 8)
+                        {
+                          addSwap ({row, col}, destination);
+                          continue;
+                        }
+
+                      if (_board[destination.x][destination.y] < 7)
+                        {
+                          int tmp = _board[destination.x][destination.y];
+                          _board[destination.x][destination.y] = _board[row][col];
+                          _board[row][col] = tmp;
+
+                          auto horizontalmatch = FindColumnMatchForCell (row, col, _board[row][col]);
+                          if (!horizontalmatch.empty())
+                            addSwap ({row, col}, destination);
+
+                          horizontalmatch = FindColumnMatchForCell (destination.x, destination.y,
+                                                                    _board[destination.x][destination.y]);
+                          if (!horizontalmatch.empty())
+                            addSwap (destination, {row, col});
+
+                          auto verticalmatch = FindRowMatchForCell(row, col, _board[row][col]);
+                          if (!verticalmatch.empty())
+                            addSwap ({row, col}, destination);
+
+                          verticalmatch = FindRowMatchForCell(destination.x, destination.y,
+                                                              _board[destination.x][destination.y]);
+                          if (!verticalmatch.empty())
+                            addSwap (destination, {row, col});
+
+                          tmp = _board[row][col];
+                          _board[row][col] = _board[destination.x][destination.y];
+                          _board[destination.x][destination.y] = tmp;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 
 

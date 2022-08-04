@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <set>
+#include <utility>
 #include "const.hpp"
 #include "Point.hpp"
 
@@ -14,11 +16,12 @@ using namespace std;
 class Board
 {
 	private:
-		int** board = new int*[GRID_DIMENSION];
-		vector<vector<int>> colors_grid;
-        vector<Point> aligned_candies_H, aligned_candies_V;
-        int mscore = 0;
-        int mnummoves;
+		int** _board = new int*[GRID_DIMENSION];
+		vector<vector<int>> _colors_grid;
+        vector<Point> _aligned_candies_H, _aligned_candies_V;
+        int _score = 0;
+        int _nummoves;
+        vector<pair<Point, Point>> _possibleswap;
 	public:
 		Board();
 		int** getBoard();
@@ -35,6 +38,8 @@ class Board
         void SetScore(int newscore);
         int GetNumMoves();
         void SetNumMoves(int numMoves);
+        void addSwap(Point Source, Point Destination);
+        void identifypossibleswap();
 };
 
 #endif // __BOARD_H__
