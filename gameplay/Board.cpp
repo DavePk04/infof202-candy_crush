@@ -144,6 +144,7 @@ vector<Point> Board::FindRowMatchForCell(int row, int col, int color)
 bool Board::CheckMatches(){
 
   vector<Point> matchedCells;
+  matchedCells.clear();
 
   for (int row = 0; row < GRID_DIMENSION; row++)
     {
@@ -177,13 +178,21 @@ bool Board::CheckMatches(){
 
               Point to_store{row, col};
               if (count (matchedCells.begin(), matchedCells.end(), to_store) == 0)
-                matchedCells.push_back(to_store); // 5
+                matchedCells.push_back(to_store);
             }
         }
     }
 
-    for(auto CellToDelete:matchedCells)
+  for(auto CellToDelete:matchedCells)
       board[CellToDelete.x][CellToDelete.y] = -1;
+
+  if (matchedCells.size() > 3)
+    {
+      auto last = matchedCells.back();
+      board[last.x][last.y] = -2;
+    }
+
+  mscore += int(matchedCells.size());
 
   return matchedCells.size() > 0;
 
@@ -197,13 +206,19 @@ void Board::FillGrid(){
     {
       for (int row = 0; row < GRID_DIMENSION; row++)
         {
-          while (GetColorAt (row, col) == -1) {
-              for (int toFill = row; toFill > 0; toFill--)
-                {
-                  board[toFill][col] = GetColorAt (toFill-1,col);
-                }
+          while (GetColorAt (row, col) < 0) {
+            if (GetColorAt (row, col) == -1)
+              {
+                for (int toFill = row; toFill > 0; toFill--)
+                  {
+                    board[toFill][col] = GetColorAt (toFill-1,col);
+                  }
 
-              board[0][col] = COLORS_VECT[rand() % TOTALCOLOR];
+                board[0][col] = COLORS_VECT[rand() % TOTALCOLOR];
+              }
+
+            else board[row][col] = 8;
+
           }
         }
     }
@@ -211,10 +226,11 @@ void Board::FillGrid(){
 
 
 /**
-* method called when a swap is done 
+* method called when a swap is done
 */
 bool Board::swaps(Point cell_1, Point cell_2) {
   print_board(board);
+  cout << GetScore() << endl;
   std::cout << "-----" << std::endl;
   int tmp = board[cell_2.x][cell_2.y];
   board[cell_2.x][cell_2.y] = board[cell_1.x][cell_1.y];
@@ -229,40 +245,60 @@ bool Board::swaps(Point cell_1, Point cell_2) {
     }
   else
     {
+      mnummoves --;
       do
         {
           FillGrid();
         }
       while (CheckMatches());
+      if (mnummoves <= 0)
+        {
+          mnummoves = 0;
+          //GameOver status
+        }
     }
   print_board(board);
+
   return changesOccurs;
 }
 
 
-// int main(){
-//     Board bd;
-//     int** board = bd.getBoard();
-//     print_board(board);
-//     printf("-----------\n");
-// //     bd.swap(Point{0,6}, Point{0,5});
-// //     printf("-----------\n");
-//      bd.swap(Point{0,6}, Point{1,6});
-//   printf("-----------\n");
-//      bd.swap(Point{2,7}, Point{2,6});
-//     // bd.swap(Point{1,0}, Point{1,1});
-//     printf("-----------\n");
-//     //bd.swap(Point{7,1}, Point{8,1});
-//     //bd.swap(Point{2,6}, Point{3,6});
-//     // bd.swap(Point{8,8}, Point{8,7});
-//     // vector<Point> vector1 = {Point{8,0}, Point{8,1}, Point{8,2}};
-//     // vector<Point> vector2 = {Point{3,6}, Point{4,6}, Point{5,6}};
-//     // bd.delete_candies(vector2);
-//     // printf("-----------\n");
-//     // print_board(board);
-// }
+int Board::GetScore ()
+{
+  return mscore;
+}
 
 
+void Board::SetScore (int newscore)
+{
+  mscore = newscore;
+}
+
+
+int Board::GetNumMoves ()
+{
+  return mnummoves;
+}
+
+
+void Board::SetNumMoves (int numMoves)
+{
+  mnummoves = numMoves;
+}
+
+
+void Board::bomb (Point bombpos)
+{
+  vector<Point> explosion;
+  explosion.push_back (bombpos);
+  for (auto dir : BOMBDIR)
+    explosion.push_back (bombpos+dir);
+
+  for(auto CellToDelete:explosion)
+    board[CellToDelete.x][CellToDelete.y] = -1;
+
+  FillGrid();
+}
 
 
 

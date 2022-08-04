@@ -27,6 +27,12 @@ Canvas::Canvas() {
             case MAGENTA:
                 cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_MAGENTA});
                 break;
+            case DARK_YL:
+              cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_DARK_YELLOW});
+              break;
+            case BLACK:
+              cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_BLACK});
+              break;
             }
         }
     }
@@ -94,6 +100,12 @@ void Canvas::normalise(){
             case MAGENTA:
                 cells[x][y].change(FL_MAGENTA);
                 c.reposition(c.get_center());
+                break;
+            case DARK_YL:
+                cells[x][y].change(FL_DARK_YELLOW);
+                break;
+            case BLACK:
+                cells[x][y].change(FL_BLACK);
                 break;
             }
         }
