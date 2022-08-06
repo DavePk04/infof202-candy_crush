@@ -29,7 +29,7 @@ class Board
 		bool is_inBoard(Point pos);
 		void gen_color_grid ();
         int GetColorAt (int colomn, int row);
-        bool CheckMatches ();
+        bool CheckMatches (bool counted);
         vector<Point> FindColumnMatchForCell (int col, int row, int color);
         vector<Point> FindRowMatchForCell (int row, int col, int color);
         void FillGrid ();
