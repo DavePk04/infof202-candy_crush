@@ -6,6 +6,7 @@ class Canvas {
   vector<Cell*> selected;
   Board bd;
   int** board;
+  int possible_move_anim = 0;
  public:
   Canvas();
   void draw();
@@ -14,6 +15,9 @@ class Canvas {
   void keyPressed(int keyCode);
   void gamesession(Cell *c);
   void normalise();
+  void possible_move();
+  Point p1_;
+  Point p2_;
   // Fl_Color generateColor();
   // void check(Cell *c);
   // void swim(Cell *c);

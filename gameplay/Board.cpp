@@ -277,8 +277,8 @@ bool Board::swaps (Point cell_1, Point cell_2)
       identifypossibleswap ();
       for (int i = 0; i < _possibleswap.size (); i++)
         {
-          cout << _possibleswap.at (i).first.x << _possibleswap.at (i).first.y << " and "
-               << _possibleswap.at (i).second.x << _possibleswap.at (i).second.y << endl;
+          // cout << _possibleswap.at (i).first.x << _possibleswap.at (i).first.y << " and "
+          //      << _possibleswap.at (i).second.x << _possibleswap.at (i).second.y << endl;
         }
 
 
@@ -380,6 +380,10 @@ void Board::identifypossibleswap ()
             }
         }
     }
+}
+
+vector<pair<Point, Point>> Board::get_possibleswap(){
+  return _possibleswap;
 }
 
 

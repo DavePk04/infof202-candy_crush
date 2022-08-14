@@ -64,8 +64,10 @@ void Canvas::mouseClick(Point mouseLoc) {
 
 void Canvas::keyPressed(int keyCode) {
   switch (keyCode) {
-    case 'q':
-      exit(0);
+    case 'm':{
+      possible_move_anim++;
+      possible_move();  //exit(0);
+    }
   }
 }
 
@@ -79,27 +81,27 @@ void Canvas::normalise(){
             {
             case BLUE:
                 cells[x][y].change(FL_BLUE);
-                c.reposition(c.get_center());
+                //c.reposition(c.get_center());
                 break;
             case RED:
                 cells[x][y].change(FL_RED);
-                c.reposition(c.get_center());
+                //c.reposition(c.get_center());
                 break;
             case GREEN:
                 cells[x][y].change(FL_GREEN);
-                c.reposition(c.get_center());
+                //c.reposition(c.get_center());
                 break;
             case YELLOW:
                 cells[x][y].change(FL_YELLOW);
-                c.reposition(c.get_center());
+                //c.reposition(c.get_center());
                 break;
             case CYAN:
                 cells[x][y].change(FL_CYAN);
-                c.reposition(c.get_center());
+                //c.reposition(c.get_center());
                 break;
             case MAGENTA:
                 cells[x][y].change(FL_MAGENTA);
-                c.reposition(c.get_center());
+                //c.reposition(c.get_center());
                 break;
             case DARK_YL:
                 cells[x][y].change(FL_DARK_YELLOW);
@@ -118,20 +120,47 @@ void Canvas::gamesession(Cell *c){
         selected.push_back (c);
       c->unselect ();
     }
-
     if (selected.size() == 2)
     {
         Point p1 = Point{(selected[0]->get_center().x-25)/50, (selected[0]->get_center().y-25)/50};
         Point p2 = Point{(selected[1]->get_center().x-25)/50, (selected[1]->get_center().y-25)/50};
         p1 = p1.reverse();
         p2 = p2.reverse();
-        cout << board[p1.x][p2.y] << endl;
         if (bd.swaps(p1, p2))
         {
             normalise();
         }
         selected.clear();
     }
+}
+
+void Canvas::possible_move(){
+    if (bd.get_possibleswap().size() != 0)
+    {
+        pair<Point, Point> possible_move;
+        int s = bd.get_possibleswap().size();
+        possible_move = bd.get_possibleswap()[rand()%s];
+        Point p1 = possible_move.first;
+        Point p2 = possible_move.second;
+        p1.x = p1.x-25/50;
+        p1.y = p1.y-25/50;
+        p2.x = p2.x-25/50;
+        p2.y = p2.y-25/50;
+        Fl_Color color1 =  cells[p1.x][p1.y].get_color();
+        Fl_Color color2 =  cells[p2.x][p2.y].get_color();
+        
+        while (possible_move_anim < 30)
+        {
+            cells[p1.x][p1.y].change(FL_DARK_MAGENTA);
+            cells[p2.x][p2.y].change(FL_DARK_MAGENTA);
+            possible_move_anim++;
+            Fl::wait();
+        }
+        cells[p1.x][p1.y].change(color1);
+        cells[p2.x][p2.y].change(color2);
+
+        possible_move_anim = 0;
+        }
 }
 
 /*

@@ -40,6 +40,7 @@ class Board
         void SetNumMoves(int numMoves);
         void addSwap(Point Source, Point Destination);
         void identifypossibleswap();
+        vector<pair<Point, Point>> get_possibleswap();
 };
 
 #endif // __BOARD_H__
