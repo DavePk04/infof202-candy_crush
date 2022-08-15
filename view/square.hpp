@@ -3,7 +3,7 @@
 #include <FL/fl_draw.H>
 #include <iostream>
 //#include "Board.hpp"
-#include "../gameplay/Board.hpp"
+#include "../model/Board.hpp"
 using namespace std;
 
 

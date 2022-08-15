@@ -21,9 +21,9 @@ class Cell {
  public:
   // Constructor
   Cell (Point center, int w, int h, Fl_Color color);
-  ~Cell(){};
+  ~Cell()= default;;
   void initialize();
-  Fl_Color get_color();
+  Fl_Color get_color() const;
   void set_color(Fl_Color new_color);
 
   // Methods that draw and handle events

@@ -20,7 +20,7 @@ void Cell::draw ()
 
 }
 
-Fl_Color Cell::get_color(){
+Fl_Color Cell::get_color() const{
   return color;
 }
 
