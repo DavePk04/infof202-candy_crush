@@ -1,6 +1,6 @@
 #include "gamesessioncontroller.hpp"
-#include <unistd.h>
 #include <algorithm>
+#include <fstream>
 
 void GameSessionController::initiate() {
     board = bd.getBoard();
@@ -72,6 +72,10 @@ void GameSessionController::keyPressed(int keyCode) {
       possible_move_anim++;
       possible_move();
       break;
+
+    case 'r':
+      reinitialiseScore();
+      break;
   }
 }
 
@@ -119,19 +123,27 @@ void GameSessionController::normalise(){
             }
         }
     }
+
+  if (bd.getState() == GAME_OVER)
+    {
+      saveScore();
+    }
 }
 
 void GameSessionController::drop_anim() {
     vector<Point> tmp = bd.getMatchedCells();
+
     int anim = 0;
     //cout << "tmp > " << tmp.size() << endl;
-    // while (anim < 20)
-    // {
-    //   for (auto& p : tmp)
-    //       cells[p.x][p.y].change(FL_DARK_MAGENTA);
-    //   anim++;
-    //   Fl::wait();
-    // }
+     while (anim < 20)
+     {
+       for (auto& p : tmp)
+           cells[p.x][p.y].change(FL_DARK_MAGENTA);
+       anim++;
+       Fl::wait();
+     }
+
+    bd.clearMatchedCells();
     
 }
 
@@ -162,11 +174,6 @@ vector<Cell *> GameSessionController::getSelectedCell ()
 }
 
 
-//int GameSessionController::handlePlayerAction (int action)
-//{
-//
-//    }
-//}
 std::unique_ptr<GameSessionController> GameSessionController::_instance = nullptr;
 
 GameSessionController &GameSessionController::getInstance ()
@@ -207,6 +214,34 @@ void GameSessionController::possible_move(){
     }
 }
 
+
+void GameSessionController::saveScore ()
+{
+  ifstream sv_score;
+  ofstream sv_newscore;
+  int hightscore;
+  auto score = bd.getScore();
+  sv_score.open (SV_HIGHSCORE_FILE);
+  sv_score >> hightscore;
+  sv_score.close();
+
+  if (score > hightscore)
+    {
+      sv_newscore.open (SV_HIGHSCORE_FILE);
+      sv_newscore << bd.getScore ();
+      sv_newscore.close();
+    }
+}
+
+
+void GameSessionController::reinitialiseScore ()
+{
+  ofstream sv_score;
+  sv_score.open (SV_HIGHSCORE_FILE);
+  sv_score.clear ();
+  sv_score.close();
+}
+
 int GameSessionController::getScore(){
-  return bd.GetScore();
+  return bd.getScore();
 }

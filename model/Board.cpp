@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <unordered_set>
 #include<set>
+#include <fstream>
 
 using namespace std;
 
@@ -42,9 +43,16 @@ void Board::gen_color_grid ()
   for (int i = 0; i < GRID_DIMENSION; i++)
     {
       std::vector<int> copy_color_vect (COLORS_VECT);
+
+      if (i==0 or i == 8) copy_color_vect = delete_ele (copy_color_vect, 7);
+      else copy_color_vect.push_back (7);
+
       _board[i] = new int[GRID_DIMENSION];
       for (int j = 0; j <= GRID_DIMENSION; j++)
         {
+          if (j==0 or j == 8) copy_color_vect = delete_ele (copy_color_vect, 7);
+          else if (i != 0 and i != 8) copy_color_vect.push_back (7);
+
           int left1 = GetColorAt (i, j - 1); //2
           int left2 = GetColorAt (i, j - 2);
           if (left2 != -1 && left1 == left2) // 3
@@ -52,12 +60,18 @@ void Board::gen_color_grid ()
               copy_color_vect = delete_ele (copy_color_vect, left1);
             }
 
+          if (left1 == 7 or left2 == 7)
+            copy_color_vect = delete_ele (copy_color_vect, 7);
+
           int down1 = GetColorAt (i - 1, j); // 5
           int down2 = GetColorAt (i - 2, j);
           if (down2 != -1 && down1 == down2)
             {
               copy_color_vect = delete_ele (copy_color_vect, down1);
             }
+
+          if (down1 == 7 or down2 == 7)
+            copy_color_vect = delete_ele (copy_color_vect, 7);
 
           int color = copy_color_vect[random() % copy_color_vect.size ()];
           _board[i][j] = color;
@@ -80,10 +94,34 @@ void print_board (int **data)
 
 Board::Board ()
 {
-  _nummoves = 5;
+  _nummoves = std::numeric_limits<float>::infinity();
+  game_state = RUNNING;
   gen_color_grid ();
   identifypossibleswap();
 }
+
+
+Board::Board (string level)
+{
+  ifstream levelfile;
+  levelfile.open (level);
+  if (levelfile.is_open ())
+    {
+      levelfile >> _nummoves;
+      for (int i = 0; i < GRID_DIMENSION; i++)
+        {
+          _board[i] = new int[GRID_DIMENSION];
+          for (int j = 0; j < GRID_DIMENSION; j++)
+            levelfile >> _board[i][j];
+        }
+    }
+
+  levelfile.close();
+
+  game_state = RUNNING;
+  identifypossibleswap();
+}
+
 
 int **Board::getBoard ()
 {
@@ -144,8 +182,7 @@ vector<Point> Board::FindRowMatchForCell (int row, int col, int color)
  */
 bool Board::CheckMatches (bool counted)
 {
-
-  matchedCells.clear ();
+  vector<Point> matchedCells;
 
   for (int row = 0; row < GRID_DIMENSION; row++)
     {
@@ -179,13 +216,18 @@ bool Board::CheckMatches (bool counted)
         }
     }
 
-  for (auto CellToDelete: matchedCells) _board[CellToDelete.x][CellToDelete.y] = -1;
+  for (auto CellToDelete: matchedCells)
+    {
+      _board[CellToDelete.x][CellToDelete.y] = -1;
+      copy_matchedCells.push_back (CellToDelete);
+    }
 
   if (matchedCells.size () > 3)
-    {
-      auto last = matchedCells.back ();
-      _board[last.x][last.y] = -2;
-    }
+//      if (!bombcause)
+        {
+          auto last = matchedCells.back ();
+          _board[last.x][last.y] = -2;
+        }
 
   if (counted) _score += int (matchedCells.size ());
 
@@ -213,22 +255,25 @@ void Board::FillGrid ()
 
                       switch (aboveColor)
                         {
-                          case 7: //Wall
-                            //printf ("WALL\n");
-                            if (_board[toFill][col] != 7) _board[toFill][col] = aboveColor; //par defaut
-//                            if (col + 1 < GRID_DIMENSION and abovediagColor != 7 and aboveColor != -1)
-//                              {
-//                                if (toFill+1 < GRID_DIMENSION and _board[toFill + 1][col] != 7)
-//                                  {
-//                                    _board[toFill + 1][col] = abovediagColor;
-//                                    _board[toFill-1][col+1] = -1;
-//                                  }
-//                              }
-//                            else if (toFill+1 < GRID_DIMENSION and _board[toFill + 1][col] != 7) _board[toFill + 1][col] = COLORS_VECT[random() % TOTALCOLOR];
+                          case 7: //Wall 
+                            if (abovediagColor != 7)
+                              {
+                                if (_board[toFill][col] != 7)
+                                  {
+                                    if (abovediagColor != -1)
+                                      {
+                                        _board[toFill][col] = abovediagColor;
+                                        _board[toFill-1][col+1] = -1;
+                                      }
+                                    else _board[toFill][col] = COLORS_VECT[random() % TOTALCOLOR];
+                                  }
 
+                              }
+                            else if (_board[toFill][col] != 7) _board[toFill][col] = COLORS_VECT[random() % TOTALCOLOR];
                           break;
 
                           case 8: //Bomb
+//                            bombcause = true;
                             bomb ({toFill, col});
                           break;
 
@@ -242,7 +287,7 @@ void Board::FillGrid ()
                   _board[0][col] = COLORS_VECT[random() % TOTALCOLOR];
                 }
 
-              else _board[row][col] = 8;
+              else if (GetColorAt (row, col) == -2) _board[row][col] = 8;
 
             }
         }
@@ -264,9 +309,8 @@ bool Board::swaps (Point cell_1, Point cell_2)
       return true;
     }
 
-//  print_board (_board);
-  //cout << GetScore () << endl;
-//  std::cout << "-----" << std::endl;
+  cout << getScore () << endl;  //JUST A PRINT
+
 
   //Normal color swap
   int tmp = _board[cell_2.x][cell_2.y];
@@ -284,21 +328,23 @@ bool Board::swaps (Point cell_1, Point cell_2)
   else
     {
       _nummoves--;
+      cout << "moverest = " << _nummoves << endl;
+//      bombcause = false;
       loopFillGrid();
 
       if (_nummoves <= 0) //For objectifs
         {
           _nummoves = 0;
-          //GameOver status
+          game_state = GAME_OVER;
         }
     }
 
-  //print_board (_board);
+  print_board (_board);
 
   return changesOccurs;
 }
 
-int Board::GetScore () const
+int Board::getScore () const
 {
   return _score;
 }
@@ -320,18 +366,32 @@ void Board::SetNumMoves (int numMoves)
 
 void Board::bomb (Point bombpos)
 {
-  vector<Point> explosion;
+//  bombcause = true;
+  vector<Point> otherbomb;
+  explosion.clear();
   explosion.push_back (bombpos);
   for (auto dir: BOMBDIR)
     {
       auto explosedCell = bombpos + dir;
-      if (is_inBoard (explosedCell) and _board[explosedCell.x][explosedCell.y] != 7) explosion.push_back (explosedCell);
+      if (is_inBoard (explosedCell))
+        {
+          if (_board[explosedCell.x][explosedCell.y] < 7)
+            {
+              if (count (explosion.begin (), explosion.end (), explosedCell) == 0) explosion.push_back (explosedCell);
+            }
+          else if (_board[explosedCell.x][explosedCell.y] == 8) otherbomb.push_back (explosedCell);
+        }
     }
 
 
   for (auto CellToDelete: explosion)
     _board[CellToDelete.x][CellToDelete.y] = -1;
     _score += 1;
+
+  for (auto otherbmb : otherbomb)
+    {
+      bomb (otherbmb);
+    }
 }
 
 
@@ -386,6 +446,8 @@ void Board::identifypossibleswap ()
         }
     }
 }
+
+
 void Board::loopFillGrid ()
 {
   do
@@ -395,22 +457,27 @@ void Board::loopFillGrid ()
   while (CheckMatches (true));
 
   identifypossibleswap ();
-
-  //print possible move
-  for (auto & possibleswap : _possibleswap)
-    {
-      // cout << possibleswap.first.x << possibleswap.first.y << " and "
-      //      << possibleswap.second.x << possibleswap.second.y << endl;
-    }
 }
+
 
 vector<pair<Point, Point>> Board::get_possibleswap(){
   return _possibleswap;
 }
 
+
 vector<Point> Board::getMatchedCells()
 {
-  return matchedCells;
+  return copy_matchedCells;
+}
+
+void Board::clearMatchedCells()
+{
+  copy_matchedCells.clear();
+}
+
+GameState Board::getState () const
+{
+  return game_state;
 }
 
 

@@ -17,6 +17,8 @@ const vector<Point> BOMBDIR{{0,-1},{0,1},{-1,0},{1,0}, {1,1}, {1, -1},
                             {-1, 1}, {-1, -1}, {0,-2}, {0,2}, {-2,0}, {2, 0}};
 
 enum ACTION {MOVE=1, PUSH=2, KEYDOWN=3};
+enum GameState { PENDING, RUNNING, GAME_OVER };
+const string SV_HIGHSCORE_FILE = "../highscorefile.txt";
 
 
 // wall related

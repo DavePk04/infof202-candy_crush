@@ -4,10 +4,9 @@
 class GameSessionController {
   static std::unique_ptr<GameSessionController> _instance;
   vector<vector<Cell>> cells;
-  //vector<Cell*> selected_cells;
   vector<Cell*> selected;
-  Board bd;
-  int** board;
+  Board bd{"../levels/level1"};
+  int** board = nullptr;
   int possible_move_anim = 0;
  public:
   GameSessionController() = default;
@@ -19,10 +18,11 @@ class GameSessionController {
   void selectCell(Cell *c);
   void normalise();
   vector<Cell*> getSelectedCell();
-  int handlePlayerAction(int action);
   static GameSessionController &getInstance ();
   void initiate ();
   void possible_move ();
-  void drop_anim();
-  int getScore();
+  void saveScore ();
+  void reinitialiseScore ();
+  int getScore ();
+  void drop_anim ();
 };

@@ -15,15 +15,9 @@ using namespace std;
 
 class Board
 {
-	private:
-		int** _board = new int*[GRID_DIMENSION];
-		vector<vector<int>> _colors_grid;
-        vector<Point> _aligned_candies_H, _aligned_candies_V, matchedCells;;
-        int _score = 0;
-        int _nummoves;
-        vector<pair<Point, Point>> _possibleswap;
 	public:
 		Board();
+        explicit Board(string level);
 		int** getBoard();
 		bool swaps(Point cell_1, Point cell_2);
 		static bool is_inBoard(Point pos);
@@ -34,7 +28,7 @@ class Board
         vector<Point> FindRowMatchForCell (int row, int col, int color);
         void FillGrid ();
         void bomb(Point bombpos);
-        int GetScore() const;
+        int getScore() const;
         void SetScore(int newscore);
         int GetNumMoves() const;
         void SetNumMoves(int numMoves);
@@ -42,7 +36,21 @@ class Board
         void identifypossibleswap();
         void loopFillGrid();
         vector<pair<Point, Point>> get_possibleswap ();
-  vector<Point> getMatchedCells ();
+        vector<Point> getMatchedCells ();
+        GameState getState() const;
+        void clearMatchedCells ();
+
+    private:
+      int** _board = new int*[GRID_DIMENSION];
+      vector<vector<int>> _colors_grid;
+      vector<Point> _aligned_candies_H, _aligned_candies_V, explosion, copy_matchedCells;
+    //        bool bombcause = false;
+      GameState game_state = PENDING;
+      int _score = 0;
+      float _nummoves;
+      int _score_goal;
+      vector<int> _objectives_goal;
+      vector<pair<Point, Point>> _possibleswap;
 };
 
 #endif // __BOARD_HPP__
