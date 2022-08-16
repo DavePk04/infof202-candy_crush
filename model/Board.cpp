@@ -214,7 +214,7 @@ void Board::FillGrid ()
                       switch (aboveColor)
                         {
                           case 7: //Wall
-                            printf ("WALL\n");
+                            //printf ("WALL\n");
                             if (_board[toFill][col] != 7) _board[toFill][col] = aboveColor; //par defaut
 //                            if (col + 1 < GRID_DIMENSION and abovediagColor != 7 and aboveColor != -1)
 //                              {
@@ -265,7 +265,7 @@ bool Board::swaps (Point cell_1, Point cell_2)
     }
 
 //  print_board (_board);
-  cout << GetScore () << endl;
+  //cout << GetScore () << endl;
 //  std::cout << "-----" << std::endl;
 
   //Normal color swap
@@ -293,7 +293,7 @@ bool Board::swaps (Point cell_1, Point cell_2)
         }
     }
 
-  print_board (_board);
+  //print_board (_board);
 
   return changesOccurs;
 }
@@ -399,8 +399,8 @@ void Board::loopFillGrid ()
   //print possible move
   for (auto & possibleswap : _possibleswap)
     {
-      cout << possibleswap.first.x << possibleswap.first.y << " and "
-           << possibleswap.second.x << possibleswap.second.y << endl;
+      // cout << possibleswap.first.x << possibleswap.first.y << " and "
+      //      << possibleswap.second.x << possibleswap.second.y << endl;
     }
 }
 

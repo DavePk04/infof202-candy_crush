@@ -1,8 +1,9 @@
 
 #include "../controller/gamesessioncontroller.hpp"
+#include "text.hpp"
 
 const int windowWidth = 500;
-const int windowHeight = 500;
+const int windowHeight = 520;
 const double refreshPerSecond = 60;
 
 
@@ -36,9 +37,11 @@ Do not edit!!!!
 
 class MainWindow : public Fl_Window {
   GameSessionController &game_session_controller = GameSessionController::getInstance();
-
+  Text score;
+  Text scoreNbr;
  public:
-  MainWindow() : Fl_Window(500, 500, windowWidth, windowHeight, "Candy Crush") {
+  MainWindow() : Fl_Window(500, 500, windowWidth, windowHeight, "Candy Crush"),
+  score("score : ", Point{75, 490}), scoreNbr("0", Point{130, 490}) {
     Fl::add_timeout(1.0/refreshPerSecond, Timer_CB, this);
     resizable(this);
     game_session_controller.initiate();
@@ -46,6 +49,9 @@ class MainWindow : public Fl_Window {
   void draw() override {
     Fl_Window::draw();
     game_session_controller.draw();
+    score.draw();
+    scoreNbr.setString(to_string(game_session_controller.getScore()));
+    scoreNbr.draw();
   }
 
   int handle(int event) override

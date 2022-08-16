@@ -20,15 +20,9 @@ class GameSessionController {
   void normalise();
   vector<Cell*> getSelectedCell();
   int handlePlayerAction(int action);
-  // Fl_Color generateColor();
-  // void check(Cell *c);
-  // void swim(Cell *c);
-  // void swap(Cell *c1, Cell *c2);
-  // void swap_(Cell &c1, Cell &c2);
-  // void delete_(Cell *c);
   static GameSessionController &getInstance ();
   void initiate ();
   void possible_move ();
-  Point p1_;
-  Point p2_;
+  void drop_anim();
+  int getScore();
 };

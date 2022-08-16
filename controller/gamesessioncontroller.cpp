@@ -76,6 +76,7 @@ void GameSessionController::keyPressed(int keyCode) {
 }
 
 void GameSessionController::normalise(){
+    drop_anim();
     for (int x = 0; x < GRID_DIMENSION; x++)
     {
       for (int y = 0; y < GRID_DIMENSION; y++)
@@ -83,39 +84,55 @@ void GameSessionController::normalise(){
             Cell c = cells[x][y];
             switch (board[x][y])
             {
-            case BLUE:
+            case BLUE:{ 
                 cells[x][y].change(FL_BLUE);
-                c.reposition(c.get_center());
                 break;
-            case RED:
+            }
+            case RED:{
                 cells[x][y].change(FL_RED);
-                c.reposition(c.get_center());
                 break;
-            case GREEN:
+            }
+            case GREEN:{
                 cells[x][y].change(FL_GREEN);
-                c.reposition(c.get_center());
                 break;
-            case YELLOW:
+            }
+            case YELLOW:{
                 cells[x][y].change(FL_YELLOW);
-                c.reposition(c.get_center());
                 break;
-            case CYAN:
+            }
+            case CYAN:{
                 cells[x][y].change(FL_CYAN);
-                c.reposition(c.get_center());
                 break;
-            case MAGENTA:
+            }
+            case MAGENTA:{
                 cells[x][y].change(FL_MAGENTA);
-                c.reposition(c.get_center());
                 break;
-            case DARK_YL:
+            }
+            case DARK_YL:{
                 cells[x][y].change(FL_DARK_YELLOW);
                 break;
-            case BLACK:
+            }
+            case BLACK:{
                 cells[x][y].change(FL_BLACK);
                 break;
             }
+            }
         }
     }
+}
+
+void GameSessionController::drop_anim() {
+    vector<Point> tmp = bd.getMatchedCells();
+    int anim = 0;
+    //cout << "tmp > " << tmp.size() << endl;
+    // while (anim < 20)
+    // {
+    //   for (auto& p : tmp)
+    //       cells[p.x][p.y].change(FL_DARK_MAGENTA);
+    //   anim++;
+    //   Fl::wait();
+    // }
+    
 }
 
 void GameSessionController::selectCell(Cell *c){
@@ -188,4 +205,8 @@ void GameSessionController::possible_move(){
 
       possible_move_anim = 0;
     }
+}
+
+int GameSessionController::getScore(){
+  return bd.GetScore();
 }
