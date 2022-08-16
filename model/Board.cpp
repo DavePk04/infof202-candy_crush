@@ -219,7 +219,7 @@ bool Board::CheckMatches (bool counted)
   for (auto CellToDelete: matchedCells)
     {
       _board[CellToDelete.x][CellToDelete.y] = -1;
-      copy_matchedCells.push_back (CellToDelete);
+      if (counted) copy_matchedCells.push_back (CellToDelete);
     }
 
   if (matchedCells.size () > 3)
@@ -255,7 +255,7 @@ void Board::FillGrid ()
 
                       switch (aboveColor)
                         {
-                          case 7: //Wall 
+                          case 7: //Wall
                             if (abovediagColor != 7)
                               {
                                 if (_board[toFill][col] != 7)
