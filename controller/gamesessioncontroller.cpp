@@ -200,11 +200,11 @@ GameSessionController &GameSessionController::getInstance ()
 
 void GameSessionController::possible_move(){
   chrono_possiblemove = 0;
-  if (bd.get_possibleswap().size() != 0)
+  if (!bd.get_possibleswap().empty())
     {
       pair<Point, Point> possible_move;
-      int s = bd.get_possibleswap().size();
-      possible_move = bd.get_possibleswap()[rand()%s];
+      unsigned long s = bd.get_possibleswap().size();
+      possible_move = bd.get_possibleswap()[random()%s];
       Point p1 = possible_move.first;
       Point p2 = possible_move.second;
       p1.x = p1.x-25/50;
@@ -230,8 +230,7 @@ void GameSessionController::possible_move(){
   else
     {
       bd.regen_color_grid();
-      Fl::wait(15);
-      printf ("REGEN");
+      Fl::wait(15); //#TODO do an action here
       normalise();
     }
 }
