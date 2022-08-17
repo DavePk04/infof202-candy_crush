@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <fstream>
 
+
 void GameSessionController::initiate() {
     board = bd.getBoard();
     for (int x = 0; x<GRID_DIMENSION; x++) {
@@ -36,7 +37,7 @@ void GameSessionController::initiate() {
             }
         }
     }
-
+  chrono_possiblemove = 0;
 }
 
 
@@ -44,6 +45,16 @@ void GameSessionController::draw() {
   for (auto &v: cells)
     for (auto &c: v)
       c.draw();
+
+  chrono_possiblemove++;
+
+  if (chrono_possiblemove == 900)
+    {
+      possible_move();
+      chrono_possiblemove = 0;
+    }
+  else if (chrono_possiblemove > 900) chrono_possiblemove = 0;
+
 }
 
 void GameSessionController::mouseMove(Point mouseLoc) {
@@ -66,7 +77,6 @@ void GameSessionController::keyPressed(int keyCode) {
   switch (keyCode) {
     case 'q':
       exit(0);
-      break;
 
     case 'm':
       possible_move_anim++;
@@ -76,6 +86,8 @@ void GameSessionController::keyPressed(int keyCode) {
     case 'r':
       reinitialiseScore();
       break;
+
+    default: break;
   }
 }
 
@@ -88,7 +100,7 @@ void GameSessionController::normalise(){
             Cell c = cells[x][y];
             switch (board[x][y])
             {
-            case BLUE:{ 
+            case BLUE:{
                 cells[x][y].change(FL_BLUE);
                 break;
             }
@@ -128,6 +140,7 @@ void GameSessionController::normalise(){
     {
       saveScore();
     }
+
 }
 
 void GameSessionController::drop_anim() {
@@ -186,6 +199,7 @@ GameSessionController &GameSessionController::getInstance ()
 
 
 void GameSessionController::possible_move(){
+  chrono_possiblemove = 0;
   if (bd.get_possibleswap().size() != 0)
     {
       pair<Point, Point> possible_move;
@@ -200,7 +214,8 @@ void GameSessionController::possible_move(){
       Fl_Color color1 =  cells[p1.x][p1.y].get_color();
       Fl_Color color2 =  cells[p2.x][p2.y].get_color();
 
-      while (possible_move_anim < 30)
+
+      while (possible_move_anim < 45)
         {
           cells[p1.x][p1.y].change(FL_DARK_MAGENTA);
           cells[p2.x][p2.y].change(FL_DARK_MAGENTA);
@@ -211,6 +226,13 @@ void GameSessionController::possible_move(){
       cells[p2.x][p2.y].change(color2);
 
       possible_move_anim = 0;
+    }
+  else
+    {
+      bd.regen_color_grid();
+      Fl::wait(15);
+      printf ("REGEN");
+      normalise();
     }
 }
 

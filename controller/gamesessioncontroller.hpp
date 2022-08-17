@@ -1,5 +1,8 @@
 #include "../view/cell.hpp"
 #include "../model/Board.hpp"
+#include <ctime>
+#include <chrono>
+#include <atomic>
 
 class GameSessionController {
   static std::unique_ptr<GameSessionController> _instance;
@@ -8,6 +11,8 @@ class GameSessionController {
   Board bd{"../levels/level1"};
   int** board = nullptr;
   int possible_move_anim = 0;
+  atomic<int> chrono_possiblemove;
+
  public:
   GameSessionController() = default;
   ~GameSessionController() = default;

@@ -27,13 +27,13 @@ vector<int> delete_ele (vector<int> vec, int num)
 }
 
 
-int Board::GetColorAt (int row, int col)
+int Board::GetColorAt (int row, int col, int** bd)
 {
   if (col < 0 || col >= GRID_DIMENSION
       || row < 0 || row >= GRID_DIMENSION)
     return -1;
 
-  auto color = _board[row][col];
+  auto color = bd[row][col];
 
   return color;
 }
@@ -53,8 +53,8 @@ void Board::gen_color_grid ()
           if (j==0 or j == 8) copy_color_vect = delete_ele (copy_color_vect, 7);
           else if (i != 0 and i != 8) copy_color_vect.push_back (7);
 
-          int left1 = GetColorAt (i, j - 1); //2
-          int left2 = GetColorAt (i, j - 2);
+          int left1 = GetColorAt (i, j - 1, _board); //2
+          int left2 = GetColorAt (i, j - 2, _board);
           if (left2 != -1 && left1 == left2) // 3
             {
               copy_color_vect = delete_ele (copy_color_vect, left1);
@@ -63,8 +63,8 @@ void Board::gen_color_grid ()
           if (left1 == 7 or left2 == 7)
             copy_color_vect = delete_ele (copy_color_vect, 7);
 
-          int down1 = GetColorAt (i - 1, j); // 5
-          int down2 = GetColorAt (i - 2, j);
+          int down1 = GetColorAt (i - 1, j, _board); // 5
+          int down2 = GetColorAt (i - 2, j, _board);
           if (down2 != -1 && down1 == down2)
             {
               copy_color_vect = delete_ele (copy_color_vect, down1);
@@ -145,7 +145,7 @@ vector<Point> Board::FindColumnMatchForCell (int row, int col, int color)
   vector<Point> result;
   for (int i = col + 1; i < GRID_DIMENSION; i++)
     {
-      int nextColumnColor = GetColorAt (row, i);
+      int nextColumnColor = GetColorAt (row, i, _board);
       if (nextColumnColor != color)
         {
           break;
@@ -167,7 +167,7 @@ vector<Point> Board::FindRowMatchForCell (int row, int col, int color)
   vector<Point> result;
   for (int i = row + 1; i < GRID_DIMENSION; i++)
     {
-      int nextRowColor = GetColorAt (i, col);
+      int nextRowColor = GetColorAt (i, col, _board);
       if (nextRowColor != color)
         {
           break;
@@ -188,7 +188,7 @@ bool Board::CheckMatches (bool counted)
     {
       for (int col = 0; col < GRID_DIMENSION; col++)
         {
-          int currentColor = GetColorAt (row, col);
+          int currentColor = GetColorAt (row, col, _board);
 
           _aligned_candies_H = FindColumnMatchForCell (row, col, currentColor);
 
@@ -244,14 +244,14 @@ void Board::FillGrid ()
     {
       for (int row = 0; row < GRID_DIMENSION; row++)
         {
-          while (GetColorAt (row, col) < 0)
+          while (GetColorAt (row, col, _board) < 0)
             {
-              if (GetColorAt (row, col) == -1)
+              if (GetColorAt (row, col, _board) == -1)
                 {
                   for (int toFill = row; toFill > 0; toFill--)
                     {
-                      auto aboveColor = GetColorAt (toFill - 1, col);
-                      auto abovediagColor = GetColorAt (toFill-1, col + 1);
+                      auto aboveColor = GetColorAt (toFill - 1, col, _board);
+                      auto abovediagColor = GetColorAt (toFill-1, col + 1, _board);
 
                       switch (aboveColor)
                         {
@@ -287,7 +287,7 @@ void Board::FillGrid ()
                   _board[0][col] = COLORS_VECT[random() % TOTALCOLOR];
                 }
 
-              else if (GetColorAt (row, col) == -2) _board[row][col] = 8;
+              else if (GetColorAt (row, col, _board) == -2) _board[row][col] = 8;
 
             }
         }
@@ -385,8 +385,11 @@ void Board::bomb (Point bombpos)
 
 
   for (auto CellToDelete: explosion)
-    _board[CellToDelete.x][CellToDelete.y] = -1;
-    _score += 1;
+    {
+      _board[CellToDelete.x][CellToDelete.y] = -1;
+      _score += 1;
+      copy_matchedCells.push_back (CellToDelete);
+    }
 
   for (auto otherbmb : otherbomb)
     {
@@ -405,7 +408,7 @@ void Board::addSwap (Point Source, Point Destination)
 
 void Board::identifypossibleswap ()
 {
-  _possibleswap.clear ();
+  _possibleswap.clear();
   for (int row = 0; row < GRID_DIMENSION; row++)
     {
       for (int col = 0; col < GRID_DIMENSION; col++)
@@ -478,6 +481,56 @@ void Board::clearMatchedCells()
 GameState Board::getState () const
 {
   return game_state;
+}
+void Board::regen_color_grid ()
+{
+
+  int** _newboard = new int*[GRID_DIMENSION];
+
+  for (int i = 0; i < GRID_DIMENSION; i++)
+    {
+      std::vector<int> copy_color_vect (COLORS_VECT);
+      delete_ele (copy_color_vect, 7);
+
+      _newboard[i] = new int[GRID_DIMENSION];
+
+      for (int j = 0; j < GRID_DIMENSION; j++)
+        {
+
+          int left1 = GetColorAt (i, j - 1, _newboard); //2
+          int left2 = GetColorAt (i, j - 2, _newboard);
+          if (left2 != -1 && left1 == left2) // 3
+            {
+              copy_color_vect = delete_ele (copy_color_vect, left1);
+            }
+
+
+          int down1 = GetColorAt (i - 1, j, _newboard); // 5
+          int down2 = GetColorAt (i - 2, j, _newboard);
+          if (down2 != -1 && down1 == down2)
+            {
+              copy_color_vect = delete_ele (copy_color_vect, down1);
+            }
+
+
+          int color = copy_color_vect[random() % copy_color_vect.size ()];
+          if (_board[i][j] < 7)
+            {
+              while (color == 7)
+                {
+                  color = copy_color_vect[random() % copy_color_vect.size ()];
+                }
+              _newboard[i][j] = color;
+            }
+          else if (_board[i][j] == 7) _newboard[i][j] = 7;
+          else if (_board[i][j] == 8) _newboard[i][j] = 8;
+        }
+    }
+
+  for (int i = 0; i < GRID_DIMENSION; i++)
+    for (int j = 0; j < GRID_DIMENSION; j++)
+      _board[i][j] = _newboard[i][j];
+
 }
 
 
