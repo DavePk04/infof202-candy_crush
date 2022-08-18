@@ -266,3 +266,7 @@ void GameSessionController::reinitialiseScore ()
 int GameSessionController::getScore(){
   return bd.getScore();
 }
+
+int GameSessionController::getNumMoves(){
+  return bd.getNumMoves();
+}

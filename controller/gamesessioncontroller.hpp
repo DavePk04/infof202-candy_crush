@@ -30,4 +30,5 @@ class GameSessionController {
   void reinitialiseScore ();
   int getScore ();
   void drop_anim ();
+  int getNumMoves();
 };

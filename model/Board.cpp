@@ -27,7 +27,7 @@ vector<int> delete_ele (vector<int> vec, int num)
 }
 
 
-int Board::GetColorAt (int row, int col, int** bd)
+int Board::getColorAt (int row, int col, int** bd)
 {
   if (col < 0 || col >= GRID_DIMENSION
       || row < 0 || row >= GRID_DIMENSION)
@@ -53,8 +53,8 @@ void Board::gen_color_grid ()
           if (j==0 or j == 8) copy_color_vect = delete_ele (copy_color_vect, 7);
           else if (i != 0 and i != 8) copy_color_vect.push_back (7);
 
-          int left1 = GetColorAt (i, j - 1, _board); //2
-          int left2 = GetColorAt (i, j - 2, _board);
+          int left1 = getColorAt (i, j - 1, _board); //2
+          int left2 = getColorAt (i, j - 2, _board);
           if (left2 != -1 && left1 == left2) // 3
             {
               copy_color_vect = delete_ele (copy_color_vect, left1);
@@ -63,8 +63,8 @@ void Board::gen_color_grid ()
           if (left1 == 7 or left2 == 7)
             copy_color_vect = delete_ele (copy_color_vect, 7);
 
-          int down1 = GetColorAt (i - 1, j, _board); // 5
-          int down2 = GetColorAt (i - 2, j, _board);
+          int down1 = getColorAt (i - 1, j, _board); // 5
+          int down2 = getColorAt (i - 2, j, _board);
           if (down2 != -1 && down1 == down2)
             {
               copy_color_vect = delete_ele (copy_color_vect, down1);
@@ -145,7 +145,7 @@ vector<Point> Board::FindColumnMatchForCell (int row, int col, int color)
   vector<Point> result;
   for (int i = col + 1; i < GRID_DIMENSION; i++)
     {
-      int nextColumnColor = GetColorAt (row, i, _board);
+      int nextColumnColor = getColorAt (row, i, _board);
       if (nextColumnColor != color)
         {
           break;
@@ -167,7 +167,7 @@ vector<Point> Board::FindRowMatchForCell (int row, int col, int color)
   vector<Point> result;
   for (int i = row + 1; i < GRID_DIMENSION; i++)
     {
-      int nextRowColor = GetColorAt (i, col, _board);
+      int nextRowColor = getColorAt (i, col, _board);
       if (nextRowColor != color)
         {
           break;
@@ -188,7 +188,7 @@ bool Board::CheckMatches (bool counted)
     {
       for (int col = 0; col < GRID_DIMENSION; col++)
         {
-          int currentColor = GetColorAt (row, col, _board);
+          int currentColor = getColorAt (row, col, _board);
 
           _aligned_candies_H = FindColumnMatchForCell (row, col, currentColor);
 
@@ -238,20 +238,20 @@ bool Board::CheckMatches (bool counted)
 /**
  * This function drop cells and generate new ones
  */
-void Board::FillGrid ()
+void Board::fillGrid ()
 {
   for (int col = 0; col < GRID_DIMENSION; col++)
     {
       for (int row = 0; row < GRID_DIMENSION; row++)
         {
-          while (GetColorAt (row, col, _board) < 0)
+          while (getColorAt (row, col, _board) < 0)
             {
-              if (GetColorAt (row, col, _board) == -1)
+              if (getColorAt (row, col, _board) == -1)
                 {
                   for (int toFill = row; toFill > 0; toFill--)
                     {
-                      auto aboveColor = GetColorAt (toFill - 1, col, _board);
-                      auto abovediagColor = GetColorAt (toFill-1, col + 1, _board);
+                      auto aboveColor = getColorAt (toFill - 1, col, _board);
+                      auto abovediagColor = getColorAt (toFill-1, col + 1, _board);
 
                       switch (aboveColor)
                         {
@@ -287,7 +287,7 @@ void Board::FillGrid ()
                   _board[0][col] = COLORS_VECT[random() % TOTALCOLOR];
                 }
 
-              else if (GetColorAt (row, col, _board) == -2) _board[row][col] = 8;
+              else if (getColorAt (row, col, _board) == -2) _board[row][col] = 8;
 
             }
         }
@@ -349,12 +349,12 @@ int Board::getScore () const
   return _score;
 }
 
-void Board::SetScore (int newscore)
+void Board::setScore (int newscore)
 {
   _score = newscore;
 }
 
-int Board::GetNumMoves () const
+int Board::getNumMoves () const
 {
   return _nummoves;
 }
@@ -455,7 +455,7 @@ void Board::loopFillGrid ()
 {
   do
     {
-      FillGrid ();
+      fillGrid ();
     }
   while (CheckMatches (true));
 
@@ -497,16 +497,16 @@ void Board::regen_color_grid ()
       for (int j = 0; j < GRID_DIMENSION; j++)
         {
 
-          int left1 = GetColorAt (i, j - 1, _newboard); //2
-          int left2 = GetColorAt (i, j - 2, _newboard);
+          int left1 = getColorAt (i, j - 1, _newboard); //2
+          int left2 = getColorAt (i, j - 2, _newboard);
           if (left2 != -1 && left1 == left2) // 3
             {
               copy_color_vect = delete_ele (copy_color_vect, left1);
             }
 
 
-          int down1 = GetColorAt (i - 1, j, _newboard); // 5
-          int down2 = GetColorAt (i - 2, j, _newboard);
+          int down1 = getColorAt (i - 1, j, _newboard); // 5
+          int down2 = getColorAt (i - 2, j, _newboard);
           if (down2 != -1 && down1 == down2)
             {
               copy_color_vect = delete_ele (copy_color_vect, down1);

@@ -37,11 +37,12 @@ Do not edit!!!!
 
 class MainWindow : public Fl_Window {
   GameSessionController &game_session_controller = GameSessionController::getInstance();
-  Text score;
-  Text scoreNbr;
+  Text score, scoreNbr, remaining_moves, remainingMovesNbr;
  public:
   MainWindow() : Fl_Window(500, 500, windowWidth, windowHeight, "Candy Crush"),
-  score("score : ", Point{75, 490}), scoreNbr("0", Point{130, 490}) {
+  score("score : ", Point{75, 490}), scoreNbr("0", Point{130, 503}), remaining_moves("remaining moves :", Point{250, 480}),
+  remainingMovesNbr("0", Point{400, 505})
+ {
     Fl::add_timeout(1.0/refreshPerSecond, Timer_CB, this);
     resizable(this);
     game_session_controller.initiate();
@@ -50,8 +51,11 @@ class MainWindow : public Fl_Window {
     Fl_Window::draw();
     game_session_controller.draw();
     score.draw();
+    remaining_moves.draw();
     scoreNbr.setString(to_string(game_session_controller.getScore()));
     scoreNbr.draw();
+    remainingMovesNbr.setString(to_string(game_session_controller.getNumMoves()));
+    remainingMovesNbr.draw();
   }
 
   int handle(int event) override
