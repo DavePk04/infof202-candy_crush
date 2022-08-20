@@ -6,7 +6,7 @@
 void GameSessionController::initiate() {
     board = bd.getBoard();
     for (int x = 0; x<GRID_DIMENSION; x++) {
-        cells.push_back({});
+        cells.emplace_back();
         for (int y = 0; y<GRID_DIMENSION; y++){
             switch (board[x][y])
             {
@@ -34,6 +34,12 @@ void GameSessionController::initiate() {
             case BLACK:
               cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_BLACK});
               break;
+            case GRAY:
+              cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_DARK2});
+            break;
+            case DGRAY:
+              cells[x].push_back({{50*y+25, 50*x+25}, 40, 40, FL_DARK3});
+            break;
             }
         }
     }
@@ -71,6 +77,8 @@ void GameSessionController::mouseClick(Point mouseLoc) {
         selectCell (&c);
 
     }
+
+  chrono_possiblemove = 0;
 }
 
 void GameSessionController::keyPressed(int keyCode) {
@@ -83,8 +91,7 @@ void GameSessionController::keyPressed(int keyCode) {
       possible_move();
       break;
 
-    case 'r':
-      reinitialiseScore();
+    case 'r':reinitialiseHightScore ();
       break;
 
     default: break;
@@ -94,52 +101,71 @@ void GameSessionController::keyPressed(int keyCode) {
 void GameSessionController::normalise(){
     drop_anim();
     for (int x = 0; x < GRID_DIMENSION; x++)
-    {
-      for (int y = 0; y < GRID_DIMENSION; y++)
-        {
+      {
+        for (int y = 0; y < GRID_DIMENSION; y++)
+          {
             Cell c = cells[x][y];
             switch (board[x][y])
-            {
-            case BLUE:{
-                cells[x][y].change(FL_BLUE);
-                break;
-            }
-            case RED:{
-                cells[x][y].change(FL_RED);
-                break;
-            }
-            case GREEN:{
-                cells[x][y].change(FL_GREEN);
-                break;
-            }
-            case YELLOW:{
-                cells[x][y].change(FL_YELLOW);
-                break;
-            }
-            case CYAN:{
-                cells[x][y].change(FL_CYAN);
-                break;
-            }
-            case MAGENTA:{
-                cells[x][y].change(FL_MAGENTA);
-                break;
-            }
-            case DARK_YL:{
-                cells[x][y].change(FL_DARK_YELLOW);
-                break;
-            }
-            case BLACK:{
-                cells[x][y].change(FL_BLACK);
-                break;
-            }
-            }
-        }
-    }
+              {
+                case BLUE:
+                  {
+                    cells[x][y].change (FL_BLUE);
+                    break;
+                  }
+                case RED:
+                  {
+                    cells[x][y].change (FL_RED);
+                    break;
+                  }
+                case GREEN:
+                  {
+                    cells[x][y].change (FL_GREEN);
+                    break;
+                  }
+                case YELLOW:
+                  {
+                    cells[x][y].change (FL_YELLOW);
+                    break;
+                  }
+                case CYAN:
+                  {
+                    cells[x][y].change (FL_CYAN);
+                    break;
+                  }
+                case MAGENTA:
+                  {
+                    cells[x][y].change (FL_MAGENTA);
+                    break;
+                  }
+                case DARK_YL:
+                  {
+                    cells[x][y].change (FL_DARK_YELLOW);
+                    break;
+                  }
+                case BLACK:
+                  {
+                    cells[x][y].change (FL_BLACK);
+                    break;
+                  }
+                case GRAY :
+                  {
+                    cells[x][y].change (FL_DARK2);
+                    break;
+                  }
+                case DGRAY :
+                  {
+                    cells[x][y].change (FL_DARK3);
+                    break;
+                  }
+              }
+          }
+      }
 
   if (bd.getState() == GAME_OVER)
     {
       saveScore();
     }
+  chrono_possiblemove = 0;
 
 }
 
@@ -255,7 +281,7 @@ void GameSessionController::saveScore ()
 }
 
 
-void GameSessionController::reinitialiseScore ()
+void GameSessionController::reinitialiseHightScore ()
 {
   ofstream sv_score;
   sv_score.open (SV_HIGHSCORE_FILE);

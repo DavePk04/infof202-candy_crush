@@ -1,14 +1,14 @@
 #include "../view/cell.hpp"
 #include "../model/Board.hpp"
-#include <ctime>
-#include <chrono>
 #include <atomic>
+
 
 class GameSessionController {
   static std::unique_ptr<GameSessionController> _instance;
   vector<vector<Cell>> cells;
   vector<Cell*> selected;
-  Board bd{"../levels/level1"};
+//  Board bd;
+  Board bd{"../levels/level3"};
   int** board = nullptr;
   int possible_move_anim = 0;
   atomic<int> chrono_possiblemove;
@@ -27,7 +27,7 @@ class GameSessionController {
   void initiate ();
   void possible_move ();
   void saveScore ();
-  void reinitialiseScore ();
+  static void reinitialiseHightScore ();
   int getScore ();
   void drop_anim ();
   int getNumMoves();
