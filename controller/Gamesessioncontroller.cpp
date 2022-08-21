@@ -254,7 +254,7 @@ void GameSessionController::possible_move ()
     }
   else
     {
-      fl_alert("Oops !! pas de mouvements possibles");
+      fl_choice("Oops !! pas de mouvements possibles", "continuer", 0, 0);
       bd.regen_color_grid ();
       Fl::wait (15); //#TODO do an action here
       normalise ();

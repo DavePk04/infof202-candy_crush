@@ -94,33 +94,41 @@ class GameviewWindow : public Fl_Window {
   static void play_cb (Fl_Widget *, void *)
   {
     quit = true;
-    auto *window = new GameSessionViewWindow ();
-    window->show ();
-    window->end ();
+    auto *game_session_window = new GameSessionViewWindow ();
+    game_session_window->size_range (WINDOWWIDTH, WINDOWHEIGHT, WINDOWWIDTH, WINDOWHEIGHT);
+    game_session_window->position (750,250);
+    game_session_window->show ();
+    game_session_window->end ();
   }
 
   static void lvl1_cb (Fl_Widget *, void *)
   {
     quit = true;
-    auto *window = new GameSessionViewWindow (0);
-    window->show ();
-    window->end ();
+    auto *game_session_window = new GameSessionViewWindow (0);
+    game_session_window->size_range (WINDOWWIDTH, WINDOWHEIGHT, WINDOWWIDTH, WINDOWHEIGHT);
+    game_session_window->position (750,250);
+    game_session_window->show ();
+    game_session_window->end ();
   }
 
   static void lvl2_cb (Fl_Widget *, void *)
   {
     quit = true;
-    auto *window = new GameSessionViewWindow (1);
-    window->show ();
-    window->end ();
+    auto *game_session_window = new GameSessionViewWindow (1);
+    game_session_window->size_range (WINDOWWIDTH, WINDOWHEIGHT, WINDOWWIDTH, WINDOWHEIGHT);
+    game_session_window->position (750,250);
+    game_session_window->show ();
+    game_session_window->end ();
   }
 
   static void lvl3_cb (Fl_Widget *, void *)
   {
     quit = true;
-    auto *window = new GameSessionViewWindow (2);
-    window->show ();
-    window->end ();
+    auto *game_session_window = new GameSessionViewWindow (2);
+    game_session_window->size_range (WINDOWWIDTH, WINDOWHEIGHT, WINDOWWIDTH, WINDOWHEIGHT);
+    game_session_window->position (750,250);
+    game_session_window->show ();
+    game_session_window->end ();
   }
 
   void draw () override

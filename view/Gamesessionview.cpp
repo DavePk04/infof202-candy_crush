@@ -51,6 +51,7 @@ GameSessionViewWindow::GameSessionViewWindow (int idx) : Fl_Window (500, 500, WI
         if (levelidx > -1 and levelidx < 3)
           {
             game_session_controller.reset ();
+            Fl::wait (10);
             game_session_controller.newLevelinit (++levelidx);
 
             auto res = fl_choice("Next : Level %i, Continue ?", "Yes, let go !", "No, exit", 0, levelidx + 1);
