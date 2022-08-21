@@ -2,9 +2,6 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Wizard.H>
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Shared_Image.H>
-#include <Fl/Fl_JPEG_Image.H>
-#include <Fl/Fl_Image.H>
 #include <fstream>
 #include <ctime>
 
@@ -42,15 +39,15 @@ bool quit = false;
 bool res = true;
 
 class GameviewWindow : public Fl_Window {
-  Text name1, name2, mainWin, selectlvl, highScore;
-  Fl_JPEG_Image *img;
+  Text name1, name2, selectlvl, highScore, candycrush;
 
  public:
   GameviewWindow () :
       Fl_Window (500, 500, WINDOWWIDTH, WINDOWHEIGHT, "Candy Crush"),
       name1("Ben-David Malyane", "", Point{255, 200}), name2("Dave Pikop Pokam ", "", Point{252, 230}),
-      mainWin("Main Menu", "", Point{250, 100}), selectlvl("Select Level", "", Point{250, 100}),
-      highScore("High Score : ", "0", Point{255, 400}){
+      candycrush("CandyCrush", "", Point{250, 100}), selectlvl("Select Level", "", Point{250, 100}),
+      highScore("High Score : ", "0", Point{255, 400})
+      {
       G_wiz = new Fl_Wizard(0,0,WINDOWWIDTH,WINDOWHEIGHT);
       time_t start = time (0);
     // Wizard: page 1
@@ -64,16 +61,26 @@ class GameviewWindow : public Fl_Window {
       // image(img);
       g->end ();
     }
+
     // Wizard: page 2
     {
       Fl_Group *g = new Fl_Group (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
-      Fl_Button *play = new Fl_Button (290, 480, 100, 25, "play @->");
+      Fl_Button *play = new Fl_Button (200, 200, 100, 25, "play @->");
       play->callback (play_cb);
-      Fl_Button *level_1 = new Fl_Button (200, 100, 100, 25, "level1");
+      Fl_Button *levels = new Fl_Button (200, 300, 100, 25, "levels");
+      levels->callback (next_cb);
+
+      g->end ();
+    }
+
+    // Wizard: page 3
+    {
+      Fl_Group *g = new Fl_Group (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
+      Fl_Button *level_1 = new Fl_Button (200, 150, 100, 25, "level1");
       level_1->callback (lvl1_cb);
-      Fl_Button *level_2 = new Fl_Button (200, 150, 100, 25, "level2");
+      Fl_Button *level_2 = new Fl_Button (200, 200, 100, 25, "level2");
       level_2->callback (lvl2_cb);
-      Fl_Button *level_3 = new Fl_Button (200, 200, 100, 25, "level3");
+      Fl_Button *level_3 = new Fl_Button (200, 250, 100, 25, "level3");
       level_3->callback (lvl3_cb);
       g->end ();
       //      if (anim_time(0) - start > 1 ) next_cb ();
@@ -128,10 +135,17 @@ class GameviewWindow : public Fl_Window {
 
     if (next_compt == 0)
       {
-        mainWin.setFontSize (50);
-        mainWin.draw ();
+        candycrush.setFontSize (50);
+        candycrush.draw ();
         name1.draw ();
         name2.draw ();
+      }
+
+    else if (next_compt == 1)
+      {
+        candycrush.setFontSize (50);
+        candycrush.draw ();
+
         ifstream sv_score;
         int hightscore;
         sv_score.open (SV_HIGHSCORE_FILE);
@@ -139,9 +153,9 @@ class GameviewWindow : public Fl_Window {
         sv_score.close ();
         highScore.setSecondString(to_string(hightscore));
         highScore.draw();
-        //highScoreNbr.draw();
       }
-    else if (next_compt == 1)
+
+    else if (next_compt == 2)
       {
         selectlvl.setFontSize(50);
         selectlvl.draw();

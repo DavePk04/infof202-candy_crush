@@ -21,8 +21,6 @@ GameSessionViewWindow::GameSessionViewWindow (int idx) : Fl_Window (500, 500, WI
   {
     Fl_Window::draw ();
     game_session_controller.draw ();
-    score.draw ();
-    remaining_moves.draw ();
     score.setSecondString (to_string (game_session_controller.getScore ()));
     remaining_moves.setSecondString (to_string (game_session_controller.getNumMoves ()));
     score.draw ();
