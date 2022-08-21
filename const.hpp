@@ -7,7 +7,7 @@ using namespace std;
 // constants
 
 const int WINDOWWIDTH = 500;
-const int WINDOWHEIGHT = 520;
+const int WINDOWHEIGHT = 550;
 const double REFRESHPERSECOND = 60;
 
 // _board related

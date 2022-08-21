@@ -5,6 +5,7 @@
 #include <FL/Fl_Shared_Image.H>
 #include <Fl/Fl_JPEG_Image.H>
 #include <Fl/Fl_Image.H>
+#include <fstream>
 #include <ctime>
 
 
@@ -41,22 +42,20 @@ bool quit = false;
 bool res = true;
 
 class GameviewWindow : public Fl_Window {
-  Text text, name1, name2;
+  Text name1, name2, mainWin, selectlvl, highScore;
   Fl_JPEG_Image *img;
 
  public:
   GameviewWindow () :
       Fl_Window (500, 500, WINDOWWIDTH, WINDOWHEIGHT, "Candy Crush"),
-      name1 ("Ben-David Malyane ", Point{255, 200}), name2 ("Dave Pikop Pokam ", Point{252,
-                                                                                       230}), text ("Candy Crush", Point{
-      250, 100})
-  {
-    G_wiz = new Fl_Wizard (0, 0, 500, 520);
-
-    time_t start = time (0);
+      name1("Ben-David Malyane", "", Point{255, 200}), name2("Dave Pikop Pokam ", "", Point{252, 230}),
+      mainWin("Main Menu", "", Point{250, 100}), selectlvl("Select Level", "", Point{250, 100}),
+      highScore("High Score : ", "0", Point{255, 400}){
+      G_wiz = new Fl_Wizard(0,0,WINDOWWIDTH,WINDOWHEIGHT);
+      time_t start = time (0);
     // Wizard: page 1
     {
-      Fl_Group *g = new Fl_Group (0, 0, 500, 520);
+      Fl_Group *g = new Fl_Group (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
       Fl_Button *startbtn = new Fl_Button (290, 480, 100, 25, "start @->");
       startbtn->callback (next_cb);
 //      startbtn->hide();
@@ -67,7 +66,7 @@ class GameviewWindow : public Fl_Window {
     }
     // Wizard: page 2
     {
-      Fl_Group *g = new Fl_Group (0, 0, 500, 520);
+      Fl_Group *g = new Fl_Group (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
       Fl_Button *play = new Fl_Button (290, 480, 100, 25, "play @->");
       play->callback (play_cb);
       Fl_Button *level_1 = new Fl_Button (200, 100, 100, 25, "level1");
@@ -129,11 +128,25 @@ class GameviewWindow : public Fl_Window {
 
     if (next_compt == 0)
       {
-        text.setFontSize (50);
-        text.draw ();
+        mainWin.setFontSize (50);
+        mainWin.draw ();
         name1.draw ();
         name2.draw ();
+        ifstream sv_score;
+        int hightscore;
+        sv_score.open (SV_HIGHSCORE_FILE);
+        sv_score >> hightscore;
+        sv_score.close ();
+        highScore.setSecondString(to_string(hightscore));
+        highScore.draw();
+        //highScoreNbr.draw();
       }
+    else if (next_compt == 1)
+      {
+        selectlvl.setFontSize(50);
+        selectlvl.draw();
+      }
+
   }
 
 };
@@ -141,7 +154,6 @@ class GameviewWindow : public Fl_Window {
 int main (int argc, char *argv[])
 {
   GameviewWindow win;
-  win.color (FL_BLUE);
   win.show (argc, argv);
   win.end ();
 

@@ -10,7 +10,8 @@
 
 class GameSessionViewWindow : public Fl_Window{
   GameSessionController &game_session_controller = GameSessionController::getInstance ();
-  Text score, scoreNbr, remaining_moves, remainingMovesNbr;
+  Text score, remaining_moves;
+
   int levelidx;
  public:
   explicit GameSessionViewWindow (int idx = -1);

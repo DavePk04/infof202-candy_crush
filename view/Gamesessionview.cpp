@@ -10,10 +10,8 @@
 
 
 GameSessionViewWindow::GameSessionViewWindow (int idx) : Fl_Window (500, 500, WINDOWWIDTH, WINDOWHEIGHT, "Candy Crush"),
-                                                  score ("score : ", Point{75, 490}), scoreNbr ("0", Point{130,
-                                                                                                503}), remaining_moves ("remaining moves :", Point{
-          250, 480}),
-                                                  remainingMovesNbr ("0", Point{400, 505}), levelidx (idx)
+                                                         score ("score : ", "0", Point{100, 500}),
+                                                         remaining_moves ("remaining moves : ", "0", Point{260, 500}), levelidx (idx)
   {
     Fl::add_timeout (1.0 / REFRESHPERSECOND, Timer_CB, this);
     resizable (this);
@@ -25,10 +23,10 @@ GameSessionViewWindow::GameSessionViewWindow (int idx) : Fl_Window (500, 500, WI
     game_session_controller.draw ();
     score.draw ();
     remaining_moves.draw ();
-    scoreNbr.setString (to_string (game_session_controller.getScore ()));
-    scoreNbr.draw ();
-    remainingMovesNbr.setString (to_string (game_session_controller.getNumMoves ()));
-    remainingMovesNbr.draw ();
+    score.setSecondString (to_string (game_session_controller.getScore ()));
+    remaining_moves.setSecondString (to_string (game_session_controller.getNumMoves ()));
+    score.draw ();
+    remaining_moves.draw ();
   }
 
   int GameSessionViewWindow::handle (int event)
