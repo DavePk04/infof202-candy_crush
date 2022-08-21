@@ -7,10 +7,11 @@
 #include <FL/Fl_Shared_Image.H>
 #include <Fl/Fl_JPEG_Image.H>
 #include <Fl/Fl_Image.H>
+#include <fstream>
 #include <ctime>
 
 const int windowWidth = 500;
-const int windowHeight = 520;
+const int windowHeight = 550;
 const double refreshPerSecond = 60;
 
 
@@ -50,14 +51,14 @@ extern bool quit = false;
 
 class MainWindow : public Fl_Window {
   GameSessionController &game_session_controller = GameSessionController::getInstance ();
-  Text score, scoreNbr, remaining_moves, remainingMovesNbr;
+  Text score, remaining_moves;
+  Fl_JPEG_Image* img;
  public:
   MainWindow () : Fl_Window (500, 500, windowWidth, windowHeight, "Candy Crush"),
-                  score ("score : ", Point{75, 490}), scoreNbr ("0", Point{130,
-                                                                           503}), remaining_moves ("remaining moves :", Point{
-          250, 480}),
-                  remainingMovesNbr ("0", Point{400, 505})
+                  score ("score : ", "0", Point{100, 500}), 
+                  remaining_moves ("remaining moves : ", "0", Point{260, 500})
   {
+    
     Fl::add_timeout (1.0 / refreshPerSecond, Timer_CB, this);
     resizable (this);
     game_session_controller.initiate ();
@@ -66,12 +67,10 @@ class MainWindow : public Fl_Window {
   {
     Fl_Window::draw ();
     game_session_controller.draw ();
+    score.setSecondString (to_string (game_session_controller.getScore ()));
+    remaining_moves.setSecondString (to_string (game_session_controller.getNumMoves ()));
     score.draw ();
     remaining_moves.draw ();
-    scoreNbr.setString (to_string (game_session_controller.getScore ()));
-    scoreNbr.draw ();
-    remainingMovesNbr.setString (to_string (game_session_controller.getNumMoves ()));
-    remainingMovesNbr.draw ();
   }
 
   int handle (int event) override
@@ -102,34 +101,30 @@ class MainWindow : public Fl_Window {
 
 
 class ModalWindow : public Fl_Window {
-  Text text, name1, name2;
+  Text name1, name2, mainWin, selectlvl, highScore;
   Fl_JPEG_Image* img;
   public:
     ModalWindow() : 
     Fl_Window(500, 500, windowWidth, windowHeight, "Candy Crush"),
-    name1("Ben-David Malyane ", Point{255, 200}), name2("Dave Pikop Pokam ", Point{252, 230}), text("Candy Crush", Point{250, 100}){
-      G_wiz = new Fl_Wizard(0,0,500,520);
+    name1("Ben-David Malyane", "", Point{255, 200}), name2("Dave Pikop Pokam ", "", Point{252, 230}), 
+    mainWin("Main Menu", "", Point{250, 100}), selectlvl("Select Level", "", Point{250, 100}), 
+    highScore("High Score : ", "0", Point{255, 400}){
+      G_wiz = new Fl_Wizard(0,0,windowWidth,windowHeight);
       time_t start = time(0);
       // Wizard: page 1
     {
-        Fl_Group *g = new Fl_Group(0,0,500,520);
-        // if (time(0)- start > 3)
-        // {
-      //   G_wiz->next(); #todo
-        // }
-        
+        Fl_Group *g = new Fl_Group(0,0,windowWidth,windowHeight);
+        G_wiz->color(FL_BLUE);
         Fl_Button *start = new Fl_Button(290,480,100,25,"start @->"); start->callback(next_cb);
-        // img = new Fl_JPEG_Image("../view/img.jpg");
-        // image(img);
         g->end();
     }
     // Wizard: page 2
     {
-        Fl_Group *g = new Fl_Group(0,0,500,520);
+        Fl_Group *g = new Fl_Group(0,0,windowWidth,windowHeight);
         Fl_Button *play = new Fl_Button(290,480,100,25,"play @->"); play->callback(done_cb);
-        Fl_Button *level_1 = new Fl_Button(200, 100,100,25,"level1"); level_1->callback(done_cb);
-        Fl_Button *level_2 = new Fl_Button(200, 150,100,25,"level2"); level_2->callback(next_cb);
-        Fl_Button *level_3 = new Fl_Button(200, 200,100,25,"level3"); level_3->callback(next_cb);
+        Fl_Button *level_1 = new Fl_Button(200, 200,100,25,"level1"); level_1->callback(done_cb);
+        Fl_Button *level_2 = new Fl_Button(200, 250,100,25,"level2"); level_2->callback(next_cb);
+        Fl_Button *level_3 = new Fl_Button(200, 300,100,25,"level3"); level_3->callback(next_cb);
         
         g->end();
     }
@@ -140,6 +135,7 @@ class ModalWindow : public Fl_Window {
     static void next_cb(Fl_Widget*,void*)
     {
       G_wiz->next();
+      G_wiz->color(FL_BLUE);
       next_compt++;
       if (next_compt == 2)
         res = true;
@@ -155,15 +151,28 @@ class ModalWindow : public Fl_Window {
 
     void draw() override
     {
-      Fl_Window::draw();
+      Fl_Window::draw(); 
       if (quit) Fl_Window::hide();
 
       if (next_compt == 0)
       {
-        text.setFontSize(50);
-        text.draw();
+        mainWin.setFontSize(50);
+        mainWin.draw();
         name1.draw();
         name2.draw();
+        ifstream sv_score;
+        int hightscore;
+        sv_score.open (SV_HIGHSCORE_FILE);
+        sv_score >> hightscore;
+        sv_score.close ();
+        highScore.setSecondString(to_string(hightscore));
+        highScore.draw();
+        //highScoreNbr.draw();
+      }
+      if (next_compt == 1)
+      {
+        selectlvl.setFontSize(50);
+        selectlvl.draw();
       }
     }
 
@@ -173,9 +182,7 @@ class ModalWindow : public Fl_Window {
 int main(int argc, char *argv[]) {
 
   ModalWindow win;
-  win.color(FL_BLUE);
   win.show(argc, argv);
   win.end();
-
   return Fl::run();
 }
