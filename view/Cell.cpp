@@ -13,7 +13,6 @@ void Cell::initialize ()
   square->color (color);
 }
 
-
 Fl_Color Cell::get_color () const
 {
   return color;
@@ -42,24 +41,6 @@ void Cell::mouseMove (Point mouseLoc)
     }
 }
 
-void Cell::mouseClick (Point mouseLoc)
-{
-  if ((square->contains (mouseLoc)))
-    {
-      selected = true;
-      //cout << '(' << square->get_position().x << ',' << square->get_position().y << ')' << endl;
-    }
-}
-
-void Cell::reposition (Point p)
-{
-  int x = p.x;
-  int y = p.y;
-  //cout << "(" << x << "," << y << endl;
-  square->position (x, y);
-  square->redraw ();
-}
-
 bool Cell::is_selected () const
 {
   return selected;
@@ -76,70 +57,71 @@ Point Cell::get_center () const
 
 void Cell::change (Fl_Color color_)
 {
-  //mutex lock;
-  //lock.lock();
   set_color (color_);
   square->color (color_);
-  //lock.unlock();
 }
 void Cell::drawWithoutAnimate ()
 {
-  square->redraw();
+  square->redraw ();
 }
 
 class Animation {
  public:
-  enum AnimationType {spin, bounce, spinAndBounce};
+  enum AnimationType { spin, bounce, spinAndBounce };
  private:
   const int animationTime = 60;
   const int bounceHeight = 200;
   Cell *c;
   AnimationType animationType;
   int anim_time = 0;
-  Point currentTranslation();
-  double currentRotation();
+  Point currentTranslation ();
  public:
-  Animation(Cell *cellToAnimate, AnimationType animationType)
-      : c{cellToAnimate}, animationType{animationType} {}
-  void draw();
-  bool isComplete();
+  Animation (Cell *cellToAnimate, AnimationType animationType)
+      : c{cellToAnimate}, animationType{animationType}
+  {}
+  void draw ();
+  bool isComplete ();
 };
 
-
-void Animation::draw() {
+void Animation::draw ()
+{
   ++anim_time;
-  Translation t3{currentTranslation()};
-  c->drawWithoutAnimate();
+  Translation t3{currentTranslation ()};
+  c->drawWithoutAnimate ();
 }
 
-Point Animation::currentTranslation() {
-  if (animationType==bounce || animationType == spinAndBounce)
-    return {0, static_cast<int>(-1*bounceHeight*sin(3.1415 * anim_time / animationTime))};
+Point Animation::currentTranslation ()
+{
+  if (animationType == bounce || animationType == spinAndBounce)
+    return {0, static_cast<int>(-1 * bounceHeight * sin (3.1415 * anim_time / animationTime))};
   else
     return {0, 0};
 }
-double Animation::currentRotation() {
-  if (animationType==spin || animationType == spinAndBounce)
-    return anim_time * 360.0 / animationTime;
-  else
-    return 0;
-}
 
-
-bool Animation::isComplete() {
+bool Animation::isComplete ()
+{
   return anim_time > 60;
 }
 
-
 void Cell::draw ()
 {
-  if (animation && animation->isComplete()) {
+  if (animation && animation->isComplete ())
+    {
       delete animation;
       animation = nullptr;
     }
   if (animation)
-    animation->draw();
+    animation->draw ();
   else
-    drawWithoutAnimate();
+    drawWithoutAnimate ();
 
+}
+
+void Cell::mouseClick (Point mouseLoc)
+{
+  if ((square->contains (mouseLoc)))
+    {
+      selected = true;
+      if (!animation) animation = new Animation (this, Animation::bounce);
+    }
 }

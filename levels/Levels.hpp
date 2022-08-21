@@ -14,15 +14,15 @@ class Levels {
   int _idx;
   string _level_filename = " ";
   float _maxMoves = 0;
-  vector<int> * _objectives = new vector<int>(8);
+  vector<int> *_objectives = new vector<int> (8);
   int **_board = new int *[GRID_DIMENSION];
   bool _level = false;
  public:
-  explicit Levels(int idx = -1);
+  explicit Levels (int idx = -1);
   int **getBoard ();
-  bool islevel() const;
-  int get_levelnumber() const;
-  float get_maxMoves() const;
+  bool islevel () const;
+  int get_levelnumber () const;
+  float get_maxMoves () const;
   bool goalAchieved ();
   vector<int> *getObjectives ();
 };

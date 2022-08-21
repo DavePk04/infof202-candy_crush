@@ -36,5 +36,5 @@ class GameSessionController {
   bool win ();
   void reset ();
   void newLevelinit (int i);
-  vector<int> * objectives ();
+  vector<int> *objectives ();
 };

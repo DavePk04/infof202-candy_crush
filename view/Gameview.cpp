@@ -6,36 +6,11 @@
 #include <ctime>
 
 
-/*--------------------------------------------------
-
-GameSessionController class.
-
-One instance of the canvas class is made by the
-GameSessionViewWindow class.
-
-The fltk system via GameSessionViewWindow calls:
-
-draw 60 times a second
-mouseMove whenever the mouse is moved
-mouseClick whenever the mouse is clicked
-keyPressed whenever a key is pressed
-
-Any drawing code should be called ONLY in draw
-or methods called by draw. If you try to draw
-elsewhere it will probably crash.
---------------------------------------------------*/
-
-
-/*--------------------------------------------------
-
-GameSessionViewWindow class.
-
-Do not edit!!!!
-
---------------------------------------------------*/
+//Setting the page wizard widget
 Fl_Wizard *G_wiz = (Fl_Wizard *) 0;
 int next_compt = 0;
 bool quit = false;
+bool reset = false;
 bool res = true;
 
 class GameviewWindow : public Fl_Window {
@@ -44,12 +19,13 @@ class GameviewWindow : public Fl_Window {
  public:
   GameviewWindow () :
       Fl_Window (500, 500, WINDOWWIDTH, WINDOWHEIGHT, "Candy Crush"),
-      name1("Ben-David Malyane", "", Point{255, 200}), name2("Dave Pikop Pokam ", "", Point{252, 230}),
-      candycrush("CandyCrush", "", Point{250, 100}), selectlvl("Select Level", "", Point{250, 100}),
-      highScore("High Score : ", "0", Point{255, 400})
-      {
-      G_wiz = new Fl_Wizard(0,0,WINDOWWIDTH,WINDOWHEIGHT);
-      time_t start = time (0);
+      name1 ("Ben-David Malyane", "", Point{255, 200}), name2 ("Dave Pikop Pokam ", "", Point{252, 230}),
+      candycrush ("CandyCrush", "", Point{250, 100}), selectlvl ("Select Level", "", Point{250, 100}),
+      highScore ("High Score : ", "0", Point{255, 400})
+  {
+    Fl::add_timeout (1.0 / REFRESHPERSECOND, Timer_CB, this);
+    G_wiz = new Fl_Wizard (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
+    time_t start = time (0);
     // Wizard: page 1
     {
       Fl_Group *g = new Fl_Group (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
@@ -63,6 +39,8 @@ class GameviewWindow : public Fl_Window {
       Fl_Group *g = new Fl_Group (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
       Fl_Button *play = new Fl_Button (200, 200, 100, 25, "play @->");
       play->callback (play_cb);
+      Fl_Button *resethightscore = new Fl_Button (200, 450, 100, 25, "reset");
+      resethightscore->callback (erase_cb);
       Fl_Button *levels = new Fl_Button (200, 300, 100, 25, "levels");
       levels->callback (next_cb);
       g->end ();
@@ -96,9 +74,18 @@ class GameviewWindow : public Fl_Window {
     quit = true;
     auto *game_session_window = new GameSessionViewWindow ();
     game_session_window->size_range (WINDOWWIDTH, WINDOWHEIGHT, WINDOWWIDTH, WINDOWHEIGHT);
-    game_session_window->position (750,250);
+    game_session_window->position (750, 250);
     game_session_window->show ();
     game_session_window->end ();
+  }
+
+  static void erase_cb (Fl_Widget *, void *)
+  {
+    reset = true;
+    ofstream sv_newscore;
+    sv_newscore.open (SV_HIGHSCORE_FILE);
+    sv_newscore << 0;
+    sv_newscore.close ();
   }
 
   static void lvl1_cb (Fl_Widget *, void *)
@@ -106,7 +93,7 @@ class GameviewWindow : public Fl_Window {
     quit = true;
     auto *game_session_window = new GameSessionViewWindow (0);
     game_session_window->size_range (WINDOWWIDTH, WINDOWHEIGHT, WINDOWWIDTH, WINDOWHEIGHT);
-    game_session_window->position (750,250);
+    game_session_window->position (750, 250);
     game_session_window->show ();
     game_session_window->end ();
   }
@@ -116,7 +103,7 @@ class GameviewWindow : public Fl_Window {
     quit = true;
     auto *game_session_window = new GameSessionViewWindow (1);
     game_session_window->size_range (WINDOWWIDTH, WINDOWHEIGHT, WINDOWWIDTH, WINDOWHEIGHT);
-    game_session_window->position (750,250);
+    game_session_window->position (750, 250);
     game_session_window->show ();
     game_session_window->end ();
   }
@@ -126,7 +113,7 @@ class GameviewWindow : public Fl_Window {
     quit = true;
     auto *game_session_window = new GameSessionViewWindow (2);
     game_session_window->size_range (WINDOWWIDTH, WINDOWHEIGHT, WINDOWWIDTH, WINDOWHEIGHT);
-    game_session_window->position (750,250);
+    game_session_window->position (750, 250);
     game_session_window->show ();
     game_session_window->end ();
   }
@@ -150,31 +137,40 @@ class GameviewWindow : public Fl_Window {
         candycrush.draw ();
 
         ifstream sv_score;
-        int hightscore;
+        int hightscore = 0;
         sv_score.open (SV_HIGHSCORE_FILE);
         sv_score >> hightscore;
         sv_score.close ();
-        highScore.setSecondString(to_string(hightscore));
-        highScore.draw();
+        highScore.setSecondString (to_string (hightscore));
+//        if (reset)  highScore.setSecondString(to_string(0));
+        highScore.draw ();
       }
 
     else if (next_compt == 2)
       {
-        selectlvl.setFontSize(50);
-        selectlvl.draw();
+        selectlvl.setFontSize (50);
+        selectlvl.draw ();
       }
 
   }
 
+  static void Timer_CB (void *userdata);
 };
 
 int main (int argc, char *argv[])
 {
   GameviewWindow win;
   win.size (WINDOWWIDTH, WINDOWHEIGHT);
-  win.position (750,250);
+  win.position (750, 250);
   win.show (argc, argv);
   win.end ();
 
   return Fl::run ();
+}
+
+void GameviewWindow::Timer_CB (void *userdata)
+{
+  auto *o = (GameSessionViewWindow *) userdata;
+  o->redraw ();
+  Fl::repeat_timeout (1.0 / REFRESHPERSECOND, Timer_CB, userdata);
 }

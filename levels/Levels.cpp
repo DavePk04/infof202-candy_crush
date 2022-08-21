@@ -6,7 +6,7 @@
 #include "Levels.hpp"
 #include <sstream>
 
-Levels::Levels(int idx)
+Levels::Levels (int idx)
 {
   _idx = idx;
   if (_idx != -1)
@@ -22,7 +22,7 @@ Levels::Levels(int idx)
           for (int i = 0; i < OBJECTIVES; i++)
             {
               levelfile >> _obj;
-              _objectives->at(i) = _obj;
+              _objectives->at (i) = _obj;
             }
 
           for (int i = 0; i < GRID_DIMENSION; i++)
@@ -58,7 +58,7 @@ float Levels::get_maxMoves () const
   return _maxMoves;
 }
 
-bool Levels::goalAchieved()
+bool Levels::goalAchieved ()
 {
   for (int i = 0; i < OBJECTIVES; i++)
     {
@@ -68,7 +68,7 @@ bool Levels::goalAchieved()
   return true;
 }
 
-vector<int> * Levels::getObjectives()
+vector<int> *Levels::getObjectives ()
 {
   return _objectives;
 }

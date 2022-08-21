@@ -35,12 +35,9 @@ class Cell {
   void mouseClick (Point mouseLoc);
   bool is_selected () const;
   void unselect ();
-//  void mouseClick (Point mouseLoc);
-//  void deleting();
-  void reposition (Point p);
   Point get_center () const;
   void set_center (Point new_center);
   void change (Fl_Color color_);
 
-  void drawWithoutAnimate();
+  void drawWithoutAnimate ();
 };

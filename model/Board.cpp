@@ -68,22 +68,19 @@ void Board::gen_color_grid ()
     }
 }
 
-
 Board::Board (int idx)
 {
   level = Levels{idx};
-  if (level.islevel())
+  if (level.islevel ())
     {
-      _board = level.getBoard();
-      _nummoves = level.get_maxMoves();
+      _board = level.getBoard ();
+      _nummoves = level.get_maxMoves ();
     }
   else
     {
       gen_color_grid ();
       _nummoves = 60;
     }
-
-
 
   game_state = RUNNING;
 
@@ -195,8 +192,8 @@ bool Board::CheckMatches (bool counted)
       _board[CellToDelete.x][CellToDelete.y] = -1;
       if (counted)
         {
-          if (coloridx >= 0 and level.islevel() and level.getObjectives()->at (coloridx) != 0)
-            level.getObjectives()->at (coloridx) = level.getObjectives()->at (coloridx) - 1;
+          if (coloridx >= 0 and level.islevel () and level.getObjectives ()->at (coloridx) != 0)
+            level.getObjectives ()->at (coloridx) = level.getObjectives ()->at (coloridx) - 1;
 
           copy_matchedCells.push_back (CellToDelete);
           for (auto dir: DIR)
@@ -208,7 +205,7 @@ bool Board::CheckMatches (bool counted)
                     {
                       _board[pos.x][pos.y] = -1;
                       copy_matchedCells.push_back (pos);
-                      level.getObjectives()->at (7) = level.getObjectives()->at (7) - 1;
+                      level.getObjectives ()->at (7) = level.getObjectives ()->at (7) - 1;
                     }
                   else if (_board[pos.x][pos.y] == 10)
                     _board[pos.x][pos.y] = 9;
@@ -372,10 +369,10 @@ bool Board::swaps (Point cell_1, Point cell_2)
           _nummoves = 0;
           game_state = GAME_OVER;
 
-          if (level.islevel() and !level.goalAchieved()) win = false;
+          if (level.islevel () and !level.goalAchieved ()) win = false;
           else win = true;
         }
-      else if (level.islevel() and level.goalAchieved())
+      else if (level.islevel () and level.goalAchieved ())
         {
           game_state = GAME_OVER;
           win = true;
@@ -432,8 +429,8 @@ void Board::bomb (Point bombpos)
           auto coloridx = _board[CellToDelete.x][CellToDelete.y] - 1;
           if (coloridx == 8 or coloridx == 9) coloridx = 7;
 
-          if (coloridx >= 0 and coloridx <= 7 and level.islevel() and level.getObjectives()->at (coloridx) != 0)
-            level.getObjectives()->at (coloridx) = level.getObjectives()->at (coloridx) - 1;
+          if (coloridx >= 0 and coloridx <= 7 and level.islevel () and level.getObjectives ()->at (coloridx) != 0)
+            level.getObjectives ()->at (coloridx) = level.getObjectives ()->at (coloridx) - 1;
 
           _board[CellToDelete.x][CellToDelete.y] = -1;
           _score += 1;
@@ -590,9 +587,9 @@ bool Board::isWinner () const
 {
   return win;
 }
-vector<int> * Board::objectivesgoal ()
+vector<int> *Board::objectivesgoal ()
 {
-  return level.getObjectives();
+  return level.getObjectives ();
 }
 
 

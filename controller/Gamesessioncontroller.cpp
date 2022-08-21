@@ -203,7 +203,7 @@ void GameSessionController::selectCell (Cell *c)
       if (bd.swaps (p1, p2))
         {
           normalise ();
-          if (bd.getState() == GAME_OVER and bd.isWinner()) _endgame = true;
+          if (bd.getState () == GAME_OVER and bd.isWinner ()) _endgame = true;
         }
       selected.clear ();
     }
@@ -254,7 +254,7 @@ void GameSessionController::possible_move ()
     }
   else
     {
-      fl_choice("Oops !! pas de mouvements possibles", "continuer", 0, 0);
+      fl_choice ("Oops !! pas de mouvements possibles", "continuer", 0, 0);
       bd.regen_color_grid ();
       Fl::wait (15); //#TODO do an action here
       normalise ();
@@ -312,9 +312,9 @@ bool GameSessionController::endgame ()
   return _endgame;
 }
 
-bool GameSessionController::win()
+bool GameSessionController::win ()
 {
-  return bd.isWinner();
+  return bd.isWinner ();
 }
 void GameSessionController::reset ()
 {
@@ -324,9 +324,9 @@ void GameSessionController::newLevelinit (int levelidx)
 {
   bd = Board{levelidx};
   board = bd.getBoard ();
-  normalise();
+  normalise ();
 }
-vector<int> * GameSessionController::objectives ()
+vector<int> *GameSessionController::objectives ()
 {
-  return bd.objectivesgoal();
+  return bd.objectivesgoal ();
 }
