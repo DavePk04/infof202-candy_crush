@@ -1,6 +1,6 @@
 
-#include "../controller/gamesessioncontroller.hpp"
-#include "text.hpp"
+#include "../controller/Gamesessioncontroller.hpp"
+#include "Text.hpp"
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Wizard.H>
 #include <FL/Fl_Window.H>
@@ -49,29 +49,32 @@ extern bool quit = false;
 
 
 class MainWindow : public Fl_Window {
-  GameSessionController &game_session_controller = GameSessionController::getInstance();
+  GameSessionController &game_session_controller = GameSessionController::getInstance ();
   Text score, scoreNbr, remaining_moves, remainingMovesNbr;
  public:
-  MainWindow() : Fl_Window(500, 500, windowWidth, windowHeight, "Candy Crush"),
-  score("score : ", Point{75, 490}), scoreNbr("0", Point{130, 503}), remaining_moves("remaining moves :", Point{250, 480}),
-  remainingMovesNbr("0", Point{400, 505})
- {
-    Fl::add_timeout(1.0/refreshPerSecond, Timer_CB, this);
-    resizable(this);
-    game_session_controller.initiate();
+  MainWindow () : Fl_Window (500, 500, windowWidth, windowHeight, "Candy Crush"),
+                  score ("score : ", Point{75, 490}), scoreNbr ("0", Point{130,
+                                                                           503}), remaining_moves ("remaining moves :", Point{
+          250, 480}),
+                  remainingMovesNbr ("0", Point{400, 505})
+  {
+    Fl::add_timeout (1.0 / refreshPerSecond, Timer_CB, this);
+    resizable (this);
+    game_session_controller.initiate ();
   }
-  void draw() override {
-    Fl_Window::draw();
-    game_session_controller.draw();
-    score.draw();
-    remaining_moves.draw();
-    scoreNbr.setString(to_string(game_session_controller.getScore()));
-    scoreNbr.draw();
-    remainingMovesNbr.setString(to_string(game_session_controller.getNumMoves()));
-    remainingMovesNbr.draw();
+  void draw () override
+  {
+    Fl_Window::draw ();
+    game_session_controller.draw ();
+    score.draw ();
+    remaining_moves.draw ();
+    scoreNbr.setString (to_string (game_session_controller.getScore ()));
+    scoreNbr.draw ();
+    remainingMovesNbr.setString (to_string (game_session_controller.getNumMoves ()));
+    remainingMovesNbr.draw ();
   }
 
-  int handle(int event) override
+  int handle (int event) override
   {
     switch (event)
       {
@@ -81,17 +84,19 @@ class MainWindow : public Fl_Window {
         return 1;
         case FL_KEYDOWN: game_session_controller.keyPressed (Fl::event_key ());
         return 1;
+        case FL_DRAG: game_session_controller.mouseDrag (Point{Fl::event_x (), Fl::event_y ()});
+        return 1;
 
         default: return 0;
 
       }
   }
 
-
-  static void Timer_CB(void *userdata) {
-    auto *o = (MainWindow*) userdata;
-    o->redraw();
-    Fl::repeat_timeout(1.0/refreshPerSecond, Timer_CB, userdata);
+  static void Timer_CB (void *userdata)
+  {
+    auto *o = (MainWindow *) userdata;
+    o->redraw ();
+    Fl::repeat_timeout (1.0 / refreshPerSecond, Timer_CB, userdata);
   }
 };
 
@@ -110,7 +115,7 @@ class ModalWindow : public Fl_Window {
         Fl_Group *g = new Fl_Group(0,0,500,520);
         // if (time(0)- start > 3)
         // {
-        //   G_wiz->next();
+      //   G_wiz->next(); #todo
         // }
         
         Fl_Button *start = new Fl_Button(290,480,100,25,"start @->"); start->callback(next_cb);
@@ -131,61 +136,46 @@ class ModalWindow : public Fl_Window {
     
     }
 
-    static void back_cb(Fl_Widget*,void*) { G_wiz->prev(); }
-    static void next_cb(Fl_Widget*,void*) { 
-    G_wiz->next(); 
-    next_compt++;
-    if (next_compt == 2)
-      res = true;
-    next_compt;
+//    static void back_cb(Fl_Widget*,void*) { G_wiz->prev(); }
+    static void next_cb(Fl_Widget*,void*)
+    {
+      G_wiz->next();
+      next_compt++;
+      if (next_compt == 2)
+        res = true;
+      next_compt;
     }
-    static void done_cb(Fl_Widget*,void*) { quit = true;
-    MainWindow *window = new MainWindow(); 
-       window->show();  
-       window->end();
+    static void done_cb(Fl_Widget*,void*)
+    {
+      quit = true;
+      MainWindow *window = new MainWindow();
+      window->show();
+      window->end();
     }
 
-    void draw() override {
-    Fl_Window::draw();
-    if (quit)
+    void draw() override
     {
-      Fl_Window::hide();
+      Fl_Window::draw();
+      if (quit) Fl_Window::hide();
+
+      if (next_compt == 0)
+      {
+        text.setFontSize(50);
+        text.draw();
+        name1.draw();
+        name2.draw();
+      }
     }
-    if (next_compt == 0){
-      text.setFontSize(50);
-      text.draw();
-      name1.draw();
-      name2.draw();
-    }
-  }
 
 };
 
-/*--------------------------------------------------
-
-main
-
-Do not edit!!!!
-
---------------------------------------------------*/
-
 
 int main(int argc, char *argv[]) {
-  // MainWindow window;
-  // window.show(argc, argv);
-  // window.end();
 
   ModalWindow win;
   win.color(FL_BLUE);
   win.show(argc, argv);
-  // //win.end();
-  // if (quit)
-  // {
-  //   //win.hide();
-  //   cout << "bb" << endl;
-  //   MainWindow window;
-  //   window.show(argc, argv);
-  //   window.end();
-  // }
+  win.end();
+
   return Fl::run();
 }

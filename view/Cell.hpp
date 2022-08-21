@@ -3,8 +3,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include "square.hpp"
-
+#include "Square.hpp"
 
 using namespace std;
 
@@ -16,27 +15,28 @@ class Cell {
   Square *square = nullptr;
 
   Fl_Color color;
+  void drawWithoutAnimate();
 
   // Private methods
  public:
   // Constructor
   Cell (Point center, int w, int h, Fl_Color color);
-  ~Cell()= default;;
-  void initialize();
-  Fl_Color get_color() const;
-  void set_color(Fl_Color new_color);
+  ~Cell () = default;;
+  void initialize ();
+  Fl_Color get_color () const;
+  void set_color (Fl_Color new_color);
 
   // Methods that draw and handle events
   void draw ();
   void mouseMove (Point mouseLoc);
-  void mouseClick(Point mouseLoc);
-  bool is_selected() const;
-  void unselect();
+  void mouseClick (Point mouseLoc);
+  bool is_selected () const;
+  void unselect ();
 //  void mouseClick (Point mouseLoc);
 //  void deleting();
-  void reposition(Point p);
-  Point get_center() const;
-  void set_center(Point new_center);
-  void change(Fl_Color color_);
+  void reposition (Point p);
+  Point get_center () const;
+  void set_center (Point new_center);
+  void change (Fl_Color color_);
 
 };

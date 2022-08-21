@@ -1,4 +1,4 @@
-#include "square.hpp"
+#include "Square.hpp"
 
 Square::Square (Fl_Boxtype b, int x, int y, int w, int h, const char *l, Fl_Color color) :
     Fl_Box (b, x, y, w, h, l)

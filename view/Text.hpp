@@ -5,7 +5,6 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Box.H>
 
-
 using namespace std;
 
 class Text {
@@ -15,29 +14,36 @@ class Text {
   Fl_Color color;
  public:
   //Constructor
-  Text(string s, Point center, int fontSize = 20, Fl_Color color = FL_BLACK):
-    s{s}, center{center}, fontSize{fontSize}, color{color} {}
+  Text (string s, Point center, int fontSize = 20, Fl_Color color = FL_BLACK) :
+      s{s}, center{center}, fontSize{fontSize}, color{color}
+  {}
 
   //Draw
-  void draw();
+  void draw ();
 
   //Setters and getters
-  string getString() {
+  string getString ()
+  {
     return s;
   }
-  void setString(const string &newString) {
+  void setString (const string &newString)
+  {
     s = newString;
   }
-  int getFontSize() {
+  int getFontSize ()
+  {
     return fontSize;
   }
-  void setFontSize(int newFontSize) {
+  void setFontSize (int newFontSize)
+  {
     fontSize = newFontSize;
   }
-  Point getCenter() {
+  Point getCenter ()
+  {
     return center;
   }
-  void setCenter(Point newCenter) {
+  void setCenter (Point newCenter)
+  {
     center = newCenter;
   }
 };
