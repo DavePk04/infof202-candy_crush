@@ -7,7 +7,7 @@ class GameSessionController {
   vector<vector<Cell>> cells;
   vector<Cell *> selected;
 //  Board bd;
-  Board bd{2};
+  Board bd{};
   int **board = nullptr;
   int possible_move_anim = 0;
   atomic<int> chrono_possiblemove;
@@ -23,7 +23,7 @@ class GameSessionController {
   void normalise ();
   vector<Cell *> getSelectedCell ();
   static GameSessionController &getInstance ();
-  void initiate ();
+  void initiate (int levelidx = -1);
   void possible_move ();
   void saveScore ();
   static void reinitialiseHightScore ();

@@ -4,8 +4,11 @@
 #include <memory>
 #include <mutex>
 #include "Square.hpp"
+#include "Animation.hpp"
 
 using namespace std;
+
+class Animation;
 
 class Cell {
   Point center;
@@ -13,9 +16,9 @@ class Cell {
   bool selected = false;
 
   Square *square = nullptr;
+  Animation *animation;
 
   Fl_Color color;
-  void drawWithoutAnimate();
 
   // Private methods
  public:
@@ -39,4 +42,5 @@ class Cell {
   void set_center (Point new_center);
   void change (Fl_Color color_);
 
+  void drawWithoutAnimate();
 };

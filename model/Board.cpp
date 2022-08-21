@@ -222,7 +222,7 @@ bool Board::CheckMatches (bool counted)
         }
     }
 
-  if (matchedCells.size () > 3)
+  if (matchedCells.size () > MIN_CANDIES_ALIGNED)
     {
       auto last = matchedCells.back ();
       _board[last.x][last.y] = -2;

@@ -5,48 +5,34 @@
 #ifndef _ANIMATION_HPP_
 #define _ANIMATION_HPP_
 
-class Animation {
- public:
-  enum AnimationType {spin, bounce, spinAndBounce};
- private:
-  const int animationTime = 60;
-  const int bounceHeight = 200;
-//  Cell *c;
-  AnimationType animationType;
-  int time{0};
-//  Point currentTranslation();
-  double currentRotation();
- public:
-//  Animation(Cell *cellToAnimate, AnimationType animationType)
-//      : c{cellToAnimate}, animationType{animationType} {}
-  void draw();
-  bool isComplete();
+#include "../model/Point.hpp"
+#include <math.h>
+
+struct Translation {
+  Translation(Point p) {
+    fl_push_matrix();
+    fl_translate(p.x, p.y);
+  }
+  ~Translation() {
+    fl_pop_matrix();
+  }
 };
 
-void Animation::draw() {
-  ++time;
-//  Translation t3{currentTranslation()};
-//  Rotation r{c->getCenter(), currentRotation()};
-//  c->drawWithoutAnimate();
-//}
+/*--------------------------------------------------
 
-//Point Animation::currentTranslation() {
-//  if (animationType==bounce || animationType == spinAndBounce)
-//    return {0, static_cast<int>(-1*bounceHeight*sin(3.1415*time/animationTime))};
-//  else
-//    return {0, 0};
-}
-double Animation::currentRotation() {
-  if (animationType==spin || animationType == spinAndBounce)
-    return time*360.0/animationTime;
-  else
-    return 0;
-}
+Rotation Class
+--------------------------------------------------*/
 
-
-bool Animation::isComplete() {
-  return time>60;
-}
-
+struct Rotation {
+  Rotation(Point center, double angle) {
+    fl_push_matrix();
+    fl_translate(center.x, center.y);
+    fl_rotate(angle);
+    fl_translate(-1*center.x, -1*center.y);
+  }
+  ~Rotation() {
+    fl_pop_matrix();
+  }
+};
 
 #endif //_ANIMATION_HPP_

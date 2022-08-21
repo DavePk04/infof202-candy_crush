@@ -6,6 +6,10 @@ using namespace std;
 
 // constants
 
+const int WINDOWWIDTH = 500;
+const int WINDOWHEIGHT = 520;
+const double REFRESHPERSECOND = 60;
+
 // _board related
 const int GRID_DIMENSION = 9;
 const int TOTALCOLOR = 6;

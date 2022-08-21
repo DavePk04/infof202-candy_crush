@@ -2,8 +2,9 @@
 #include <algorithm>
 #include <fstream>
 
-void GameSessionController::initiate ()
+void GameSessionController::initiate (int levelidx)
 {
+  bd = Board{levelidx};
   board = bd.getBoard ();
   for (int x = 0; x < GRID_DIMENSION; x++)
     {

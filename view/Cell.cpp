@@ -13,18 +13,6 @@ void Cell::initialize ()
   square->color (color);
 }
 
-void Cell::draw ()
-{
-//  if (animation && animation->isComplete()) {
-//      delete animation;
-//      animation = nullptr;
-//    }
-//  if (animation)
-//    animation->draw();
-//  else
-//    drawWithoutAnimate();
-
-}
 
 Fl_Color Cell::get_color () const
 {
@@ -97,4 +85,61 @@ void Cell::change (Fl_Color color_)
 void Cell::drawWithoutAnimate ()
 {
   square->redraw();
+}
+
+class Animation {
+ public:
+  enum AnimationType {spin, bounce, spinAndBounce};
+ private:
+  const int animationTime = 60;
+  const int bounceHeight = 200;
+  Cell *c;
+  AnimationType animationType;
+  int time = 0;
+  Point currentTranslation();
+  double currentRotation();
+ public:
+  Animation(Cell *cellToAnimate, AnimationType animationType)
+      : c{cellToAnimate}, animationType{animationType} {}
+  void draw();
+  bool isComplete();
+};
+
+
+void Animation::draw() {
+  ++time;
+  Translation t3{currentTranslation()};
+  c->drawWithoutAnimate();
+}
+
+Point Animation::currentTranslation() {
+  if (animationType==bounce || animationType == spinAndBounce)
+    return {0, static_cast<int>(-1*bounceHeight*sin(3.1415*time/animationTime))};
+  else
+    return {0, 0};
+}
+double Animation::currentRotation() {
+  if (animationType==spin || animationType == spinAndBounce)
+    return time*360.0/animationTime;
+  else
+    return 0;
+}
+
+
+bool Animation::isComplete() {
+  return time>60;
+}
+
+
+void Cell::draw ()
+{
+  if (animation && animation->isComplete()) {
+      delete animation;
+      animation = nullptr;
+    }
+  if (animation)
+    animation->draw();
+  else
+    drawWithoutAnimate();
+
 }
