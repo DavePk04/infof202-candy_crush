@@ -16,7 +16,7 @@ class Cell {
   bool selected = false;
 
   Square *square = nullptr;
-  Animation *animation;
+  Animation *animation = nullptr;
 
   Fl_Color color;
 

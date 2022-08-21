@@ -203,6 +203,7 @@ void GameSessionController::selectCell (Cell *c)
       if (bd.swaps (p1, p2))
         {
           normalise ();
+          if (bd.getState() == GAME_OVER and bd.isWinner()) _endgame = true;
         }
       selected.clear ();
     }
@@ -305,4 +306,27 @@ void GameSessionController::mouseDrag (Point mouseLoc)
       }
 
   chrono_possiblemove = 0;
+}
+bool GameSessionController::endgame ()
+{
+  return _endgame;
+}
+
+bool GameSessionController::win()
+{
+  return bd.isWinner();
+}
+void GameSessionController::reset ()
+{
+  _endgame = false;
+}
+void GameSessionController::newLevelinit (int levelidx)
+{
+  bd = Board{levelidx};
+  board = bd.getBoard ();
+  normalise();
+}
+vector<int> * GameSessionController::objectives ()
+{
+  return bd.objectivesgoal();
 }

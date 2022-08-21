@@ -5,13 +5,14 @@
 #include "Gamesessionview.hpp"
 
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Shared_Image.H>
+#include <Fl/fl_ask.H>
 
 
 
 GameSessionViewWindow::GameSessionViewWindow (int idx) : Fl_Window (500, 500, WINDOWWIDTH, WINDOWHEIGHT, "Candy Crush"),
-                                                         score ("score : ", "0", Point{100, 500}),
-                                                         remaining_moves ("remaining moves : ", "0", Point{260, 500}), levelidx (idx)
+                                                         score ("score : ", "0", Point{100, 560}),
+                                                         remaining_moves ("remaining moves : ", "0", Point{100, 520}), levelidx (idx),
+                                                         parent(parent)
   {
     Fl::add_timeout (1.0 / REFRESHPERSECOND, Timer_CB, this);
     resizable (this);
@@ -25,6 +26,37 @@ GameSessionViewWindow::GameSessionViewWindow (int idx) : Fl_Window (500, 500, WI
     remaining_moves.setSecondString (to_string (game_session_controller.getNumMoves ()));
     score.draw ();
     remaining_moves.draw ();
+
+    blue.setSecondString (to_string(game_session_controller.objectives()->at (0)));
+    red.setSecondString (to_string(game_session_controller.objectives()->at (1)));
+    green.setSecondString (to_string(game_session_controller.objectives()->at (2)));
+    yellow.setSecondString (to_string(game_session_controller.objectives()->at (3)));
+    cyan.setSecondString (to_string(game_session_controller.objectives()->at (4)));
+    magenta.setSecondString (to_string(game_session_controller.objectives()->at (5)));
+    magenta.setSecondString (to_string(game_session_controller.objectives()->at (6)));
+    ice.setSecondString (to_string(game_session_controller.objectives()->at (7)));
+
+    blue.draw();
+    red.draw();
+    green.draw();
+    yellow.draw();
+    cyan.draw();
+    magenta.draw();
+    magenta.draw();
+    ice.draw();
+
+
+    if (game_session_controller.endgame () and game_session_controller.win ())
+      {
+        if (levelidx > -1 and levelidx < 3)
+          {
+            game_session_controller.reset ();
+            game_session_controller.newLevelinit (++levelidx);
+
+            auto res = fl_choice("Next : Level %i, Continue ?", "Yes, let go !", "No, exit", 0, levelidx + 1);
+            if (res == 1) exit (0);
+          }
+      }
   }
 
   int GameSessionViewWindow::handle (int event)
@@ -40,7 +72,8 @@ GameSessionViewWindow::GameSessionViewWindow (int idx) : Fl_Window (500, 500, WI
         case FL_DRAG: game_session_controller.mouseDrag (Point{Fl::event_x (), Fl::event_y ()});
         return 1;
 
-        default: return 0;
+        default: game_session_controller.saveScore();
+        return 0;
 
       }
   }

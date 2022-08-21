@@ -11,6 +11,7 @@ class GameSessionController {
   int **board = nullptr;
   int possible_move_anim = 0;
   atomic<int> chrono_possiblemove;
+  bool _endgame = false;
 
  public:
   GameSessionController () = default;
@@ -31,4 +32,9 @@ class GameSessionController {
   void drop_anim ();
   int getNumMoves ();
   void mouseDrag (Point point);
+  bool endgame ();
+  bool win ();
+  void reset ();
+  void newLevelinit (int i);
+  vector<int> * objectives ();
 };

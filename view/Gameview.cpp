@@ -55,10 +55,6 @@ class GameviewWindow : public Fl_Window {
       Fl_Group *g = new Fl_Group (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
       Fl_Button *startbtn = new Fl_Button (290, 480, 100, 25, "start @->");
       startbtn->callback (next_cb);
-//      startbtn->hide();
-//      startbtn->value (0);
-      // img = new Fl_JPEG_Image("../view/img.jpg");
-      // image(img);
       g->end ();
     }
 
@@ -69,7 +65,6 @@ class GameviewWindow : public Fl_Window {
       play->callback (play_cb);
       Fl_Button *levels = new Fl_Button (200, 300, 100, 25, "levels");
       levels->callback (next_cb);
-
       g->end ();
     }
 
@@ -168,6 +163,8 @@ class GameviewWindow : public Fl_Window {
 int main (int argc, char *argv[])
 {
   GameviewWindow win;
+  win.size (WINDOWWIDTH, WINDOWHEIGHT);
+  win.position (750,250);
   win.show (argc, argv);
   win.end ();
 

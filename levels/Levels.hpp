@@ -14,7 +14,7 @@ class Levels {
   int _idx;
   string _level_filename = " ";
   float _maxMoves = 0;
-  vector<int> _objectives;
+  vector<int> * _objectives = new vector<int>(8);
   int **_board = new int *[GRID_DIMENSION];
   bool _level = false;
  public:
@@ -23,6 +23,8 @@ class Levels {
   bool islevel() const;
   int get_levelnumber() const;
   float get_maxMoves() const;
+  bool goalAchieved ();
+  vector<int> *getObjectives ();
 };
 
 #endif //_LEVELS_HPP_

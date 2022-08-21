@@ -68,18 +68,6 @@ void Board::gen_color_grid ()
     }
 }
 
-//void print_board (int **data)
-//{
-//  for (int x = 0; x < GRID_DIMENSION; x++)
-//    {
-//      for (int y = 0; y < GRID_DIMENSION; y++)
-//        {
-//          printf (" %d", data[x][y]);
-//        }
-//      printf ("\n");
-//    }
-//
-//}
 
 Board::Board (int idx)
 {
@@ -92,7 +80,7 @@ Board::Board (int idx)
   else
     {
       gen_color_grid ();
-      _nummoves = std::numeric_limits<float>::infinity ();
+      _nummoves = 60;
     }
 
 
@@ -201,9 +189,15 @@ bool Board::CheckMatches (bool counted)
 
   for (auto CellToDelete: matchedCells)
     {
+      auto coloridx = _board[CellToDelete.x][CellToDelete.y] - 1;
+      if (coloridx == 8 or coloridx == 9) coloridx = 7;
+
       _board[CellToDelete.x][CellToDelete.y] = -1;
       if (counted)
         {
+          if (coloridx >= 0 and level.islevel() and level.getObjectives()->at (coloridx) != 0)
+            level.getObjectives()->at (coloridx) = level.getObjectives()->at (coloridx) - 1;
+
           copy_matchedCells.push_back (CellToDelete);
           for (auto dir: DIR)
             {
@@ -214,6 +208,7 @@ bool Board::CheckMatches (bool counted)
                     {
                       _board[pos.x][pos.y] = -1;
                       copy_matchedCells.push_back (pos);
+                      level.getObjectives()->at (7) = level.getObjectives()->at (7) - 1;
                     }
                   else if (_board[pos.x][pos.y] == 10)
                     _board[pos.x][pos.y] = 9;
@@ -376,6 +371,14 @@ bool Board::swaps (Point cell_1, Point cell_2)
         {
           _nummoves = 0;
           game_state = GAME_OVER;
+
+          if (level.islevel() and !level.goalAchieved()) win = false;
+          else win = true;
+        }
+      else if (level.islevel() and level.goalAchieved())
+        {
+          game_state = GAME_OVER;
+          win = true;
         }
     }
 
@@ -426,6 +429,12 @@ void Board::bomb (Point bombpos)
       if (_board[CellToDelete.x][CellToDelete.y] == 10) _board[CellToDelete.x][CellToDelete.y] = 9;
       else
         {
+          auto coloridx = _board[CellToDelete.x][CellToDelete.y] - 1;
+          if (coloridx == 8 or coloridx == 9) coloridx = 7;
+
+          if (coloridx >= 0 and coloridx <= 7 and level.islevel() and level.getObjectives()->at (coloridx) != 0)
+            level.getObjectives()->at (coloridx) = level.getObjectives()->at (coloridx) - 1;
+
           _board[CellToDelete.x][CellToDelete.y] = -1;
           _score += 1;
           copy_matchedCells.push_back (CellToDelete);
@@ -576,6 +585,14 @@ void Board::regen_color_grid ()
     for (int j = 0; j < GRID_DIMENSION; j++)
       _board[i][j] = _newboard[i][j];
 
+}
+bool Board::isWinner () const
+{
+  return win;
+}
+vector<int> * Board::objectivesgoal ()
+{
+  return level.getObjectives();
 }
 
 

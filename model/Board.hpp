@@ -34,9 +34,11 @@ class Board {
   vector<pair<Point, Point>> get_possibleswap ();
   vector<Point> getMatchedCells ();
   GameState getState () const;
+  bool isWinner() const;
   void clearMatchedCells ();
   void regen_color_grid ();
 
+  vector<int> * objectivesgoal ();
  private:
   Levels level;
   int **_board = new int *[GRID_DIMENSION];
@@ -45,9 +47,8 @@ class Board {
   //        bool bombcause = false;
   GameState game_state = PENDING;
   int _score = 0;
-  float _nummoves;
-  int _score_goal;
-  vector<int> _objectives_goal;
+  int _nummoves;
+  bool win = true;
   vector<pair<Point, Point>> _possibleswap;
 
 };

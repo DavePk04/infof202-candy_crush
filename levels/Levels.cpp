@@ -16,13 +16,14 @@ Levels::Levels(int idx)
       levelfile.open (_level_filename);
       if (levelfile.is_open ())
         {
-          string _objstring;
           int _obj;
           levelfile >> _maxMoves; //get max moves
           //get objectives
-          getline (levelfile , _objstring);
-          stringstream stg( _objstring );
-          while (stg >> _obj) _objectives.push_back (_obj);
+          for (int i = 0; i < OBJECTIVES; i++)
+            {
+              levelfile >> _obj;
+              _objectives->at(i) = _obj;
+            }
 
           for (int i = 0; i < GRID_DIMENSION; i++)
             {
@@ -55,4 +56,19 @@ int Levels::get_levelnumber () const
 float Levels::get_maxMoves () const
 {
   return _maxMoves;
+}
+
+bool Levels::goalAchieved()
+{
+  for (int i = 0; i < OBJECTIVES; i++)
+    {
+      if (_objectives->at (i) != 0) return false;
+    }
+
+  return true;
+}
+
+vector<int> * Levels::getObjectives()
+{
+  return _objectives;
 }

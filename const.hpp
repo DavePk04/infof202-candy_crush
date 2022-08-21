@@ -6,15 +6,16 @@ using namespace std;
 
 // constants
 
+//Windows settings
 const int WINDOWWIDTH = 500;
-const int WINDOWHEIGHT = 550;
+const int WINDOWHEIGHT = 600;
 const double REFRESHPERSECOND = 60;
 
 // _board related
 const int GRID_DIMENSION = 9;
 const int TOTALCOLOR = 6;
 const int MIN_CANDIES_ALIGNED = 3;
-const int CANDY_DELETED = 0;
+const int OBJECTIVES = 8;
 enum COLORS {
   BLUE = 1,
   RED = 2,
