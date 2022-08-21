@@ -77,7 +77,7 @@ class GameviewWindow : public Fl_Window {
       Fl_Button *level_3 = new Fl_Button (200, 200, 100, 25, "level3");
       level_3->callback (lvl3_cb);
       g->end ();
-      //      if (time(0) - start > 1 ) next_cb ();
+      //      if (anim_time(0) - start > 1 ) next_cb ();
     }
 
   }

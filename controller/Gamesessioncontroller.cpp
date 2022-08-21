@@ -1,6 +1,7 @@
 #include "Gamesessioncontroller.hpp"
 #include <algorithm>
 #include <fstream>
+#include <FL/fl_ask.H>
 
 void GameSessionController::initiate (int levelidx)
 {
@@ -252,6 +253,7 @@ void GameSessionController::possible_move ()
     }
   else
     {
+      fl_alert("Oops !! pas de mouvements possibles");
       bd.regen_color_grid ();
       Fl::wait (15); //#TODO do an action here
       normalise ();

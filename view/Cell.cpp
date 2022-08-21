@@ -95,7 +95,7 @@ class Animation {
   const int bounceHeight = 200;
   Cell *c;
   AnimationType animationType;
-  int time = 0;
+  int anim_time = 0;
   Point currentTranslation();
   double currentRotation();
  public:
@@ -107,27 +107,27 @@ class Animation {
 
 
 void Animation::draw() {
-  ++time;
+  ++anim_time;
   Translation t3{currentTranslation()};
   c->drawWithoutAnimate();
 }
 
 Point Animation::currentTranslation() {
   if (animationType==bounce || animationType == spinAndBounce)
-    return {0, static_cast<int>(-1*bounceHeight*sin(3.1415*time/animationTime))};
+    return {0, static_cast<int>(-1*bounceHeight*sin(3.1415 * anim_time / animationTime))};
   else
     return {0, 0};
 }
 double Animation::currentRotation() {
   if (animationType==spin || animationType == spinAndBounce)
-    return time*360.0/animationTime;
+    return anim_time * 360.0 / animationTime;
   else
     return 0;
 }
 
 
 bool Animation::isComplete() {
-  return time>60;
+  return anim_time > 60;
 }
 
 
