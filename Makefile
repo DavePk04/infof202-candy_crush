@@ -6,7 +6,7 @@ LDFLAGS = -lfltk -lfltk_images
 # Sources & Build
 BUILD_DIR = build
 DIST_DIR = dist
-TARGET = $(DIST_DIR)/game
+TARGET = $(DIST_DIR)/candycrush
 SOURCES = $(notdir $(wildcard *.cpp) $(wildcard **/*.cpp) $(wildcard **/**/*.cpp))
 OBJECTS = $(addprefix $(BUILD_DIR)/, $(patsubst %.cpp, %.o, $(SOURCES)))
 DEPS = $(wildcard *.hpp) $(wildcard **/*.hpp) $(wildcard **/**/*.hpp)
