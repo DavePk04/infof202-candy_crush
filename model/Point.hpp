@@ -31,7 +31,6 @@ struct Point {
   {
     if (index == 0) return x;
     if (index == 1) return y;
-    //TODO: error
     return -1;
   }
 };

@@ -3,6 +3,16 @@
 #include <fstream>
 #include <FL/fl_ask.H>
 
+std::unique_ptr<GameSessionController> GameSessionController::_instance = nullptr;
+
+GameSessionController &GameSessionController::getInstance ()
+{
+  if (!_instance)
+    _instance = std::make_unique<GameSessionController> ();
+
+  return *_instance;
+}
+
 void GameSessionController::initiate (int levelidx)
 {
   bd = Board{levelidx};
@@ -20,19 +30,19 @@ void GameSessionController::initiate (int levelidx)
               break;
               case GREEN:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_GREEN});
               break;
-              case YELLOW:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_YELLOW});
+              case ORANGE:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, 0xffb34700});
               break;
-              case CYAN:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_CYAN});
+              case YELLOW:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_YELLOW});
               break;
               case MAGENTA:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_MAGENTA});
               break;
-              case DARK_YL:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_DARK_YELLOW});
+              case BRICK:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, 0x61242600});
               break;
-              case BLACK:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_BLACK});
+              case BOMB:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_BLACK});
               break;
-              case GRAY:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_DARK2});
+              case SIMPLEICE:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, 0xdff7fa00});
               break;
-              case DGRAY:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, FL_DARK3});
+              case DOUBLEICE:cells[x].push_back ({{50 * y + 25, 50 * x + 25}, 40, 40, 0xabd1f300});
               break;
             }
         }
@@ -94,14 +104,16 @@ void GameSessionController::keyPressed (int keyCode)
     }
 }
 
+/**
+ * This function is called for updating the grid after an action
+ */
 void GameSessionController::normalise ()
 {
-  drop_anim ();
+  explosion_anim ();
   for (int x = 0; x < GRID_DIMENSION; x++)
     {
       for (int y = 0; y < GRID_DIMENSION; y++)
         {
-          Cell c = cells[x][y];
           switch (board[x][y])
             {
               case BLUE:
@@ -119,14 +131,14 @@ void GameSessionController::normalise ()
                   cells[x][y].change (FL_GREEN);
                   break;
                 }
+              case ORANGE:
+                {
+                  cells[x][y].change (0xffb34700);
+                  break;
+                }
               case YELLOW:
                 {
                   cells[x][y].change (FL_YELLOW);
-                  break;
-                }
-              case CYAN:
-                {
-                  cells[x][y].change (FL_CYAN);
                   break;
                 }
               case MAGENTA:
@@ -134,24 +146,24 @@ void GameSessionController::normalise ()
                   cells[x][y].change (FL_MAGENTA);
                   break;
                 }
-              case DARK_YL:
+              case BRICK:
                 {
-                  cells[x][y].change (FL_DARK_YELLOW);
+                  cells[x][y].change (0x61242600);
                   break;
                 }
-              case BLACK:
+              case BOMB:
                 {
                   cells[x][y].change (FL_BLACK);
                   break;
                 }
-              case GRAY :
+              case SIMPLEICE :
                 {
-                  cells[x][y].change (FL_DARK2);
+                  cells[x][y].change (0xdff7fa00);
                   break;
                 }
-              case DGRAY :
+              case DOUBLEICE :
                 {
-                  cells[x][y].change (FL_DARK3);
+                  cells[x][y].change (0xabd1f300);
                   break;
                 }
             }
@@ -166,12 +178,11 @@ void GameSessionController::normalise ()
 
 }
 
-void GameSessionController::drop_anim ()
+void GameSessionController::explosion_anim ()
 {
   vector<Point> tmp = bd.getMatchedCells ();
 
   int anim = 0;
-  //cout << "tmp > " << tmp.size() << endl;
   while (anim < 20)
     {
       for (auto &p: tmp)
@@ -205,24 +216,14 @@ void GameSessionController::selectCell (Cell *c)
           normalise ();
           if (bd.getState () == GAME_OVER and bd.isWinner ()) _endgame = true;
         }
+      else if (bd.getState () == GAME_OVER and bd.isWinner ()) _endgame = true;
       selected.clear ();
     }
 }
-vector<Cell *> GameSessionController::getSelectedCell ()
-{
-  return selected;
-}
 
-std::unique_ptr<GameSessionController> GameSessionController::_instance = nullptr;
-
-GameSessionController &GameSessionController::getInstance ()
-{
-  if (!_instance)
-    _instance = std::make_unique<GameSessionController> ();
-
-  return *_instance;
-}
-
+/**
+ * Animation function for possible move
+ */
 void GameSessionController::possible_move ()
 {
   chrono_possiblemove = 0;
@@ -256,15 +257,16 @@ void GameSessionController::possible_move ()
     {
       fl_choice ("Oops !! pas de mouvements possibles", "continuer", 0, 0);
       bd.regen_color_grid ();
-      Fl::wait (15); //#TODO do an action here
+      Fl::wait (15);
       normalise ();
     }
 }
 
-void GameSessionController::saveScore ()
+bool GameSessionController::saveScore ()
 {
   ifstream sv_score;
   ofstream sv_newscore;
+
   int hightscore;
   auto score = bd.getScore ();
   sv_score.open (SV_HIGHSCORE_FILE);
@@ -276,7 +278,10 @@ void GameSessionController::saveScore ()
       sv_newscore.open (SV_HIGHSCORE_FILE);
       sv_newscore << bd.getScore ();
       sv_newscore.close ();
+      return false;
     }
+
+  return true;
 }
 
 void GameSessionController::reinitialiseHightScore ()
@@ -296,6 +301,7 @@ int GameSessionController::getNumMoves ()
 {
   return bd.getNumMoves ();
 }
+
 void GameSessionController::mouseDrag (Point mouseLoc)
 {
   for (auto &v: cells)
@@ -307,6 +313,7 @@ void GameSessionController::mouseDrag (Point mouseLoc)
 
   chrono_possiblemove = 0;
 }
+
 bool GameSessionController::endgame ()
 {
   return _endgame;
@@ -316,17 +323,20 @@ bool GameSessionController::win ()
 {
   return bd.isWinner ();
 }
+
 void GameSessionController::reset ()
 {
   _endgame = false;
 }
+
 void GameSessionController::newLevelinit (int levelidx)
 {
   bd = Board{levelidx};
   board = bd.getBoard ();
   normalise ();
 }
-vector<int> *GameSessionController::objectives ()
+
+vector<atomic_int> *GameSessionController::objectives ()
 {
-  return bd.objectivesgoal ();
+  return bd.getObjectives ();
 }

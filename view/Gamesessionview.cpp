@@ -7,17 +7,17 @@
 #include <FL/Fl_Window.H>
 #include <Fl/fl_ask.H>
 
-GameSessionViewWindow::GameSessionViewWindow (int idx) : Fl_Window (500, 500, WINDOWWIDTH, WINDOWHEIGHT, "Candy Crush"),
-                                                         score ("score : ", "0", Point{100, 560}),
-                                                         remaining_moves ("remaining moves : ", "0", Point{100,
-                                                                                                           520}), levelidx (idx),
-                                                         parent (parent)
+GameSessionView::GameSessionView (int idx) : Fl_Window (500, 500, WINDOWWIDTH, WINDOWHEIGHT, "Candy Crush"),
+                                             score ("score : ", "0", Point{100, 560}),
+                                             remaining_moves ("remaining moves : ", "0", Point{100,
+                                                                                               520}), levelidx (idx),
+                                             parent (parent)
 {
   Fl::add_timeout (1.0 / REFRESHPERSECOND, Timer_CB, this);
   resizable (this);
   game_session_controller.initiate (levelidx);
 }
-void GameSessionViewWindow::draw ()
+void GameSessionView::draw ()
 {
   Fl_Window::draw ();
   game_session_controller.draw ();
@@ -29,8 +29,8 @@ void GameSessionViewWindow::draw ()
   blue.setSecondString (to_string (game_session_controller.objectives ()->at (0)));
   red.setSecondString (to_string (game_session_controller.objectives ()->at (1)));
   green.setSecondString (to_string (game_session_controller.objectives ()->at (2)));
-  yellow.setSecondString (to_string (game_session_controller.objectives ()->at (3)));
-  cyan.setSecondString (to_string (game_session_controller.objectives ()->at (4)));
+  orange.setSecondString (to_string (game_session_controller.objectives ()->at (3)));
+  yellow.setSecondString (to_string (game_session_controller.objectives ()->at (4)));
   magenta.setSecondString (to_string (game_session_controller.objectives ()->at (5)));
   magenta.setSecondString (to_string (game_session_controller.objectives ()->at (6)));
   ice.setSecondString (to_string (game_session_controller.objectives ()->at (7)));
@@ -38,29 +38,52 @@ void GameSessionViewWindow::draw ()
   blue.draw ();
   red.draw ();
   green.draw ();
+  orange.draw ();
   yellow.draw ();
-  cyan.draw ();
   magenta.draw ();
   magenta.draw ();
   ice.draw ();
 
   if (game_session_controller.endgame () and game_session_controller.win ())
     {
-      if (levelidx > -1 and levelidx < 3)
+      if (levelidx > -1 and levelidx < 2)
         {
           game_session_controller.reset ();
           Fl::wait (10);
           game_session_controller.newLevelinit (++levelidx);
 
-          auto res = fl_choice ("Next : Level %i, Continue ?", "Yes, let go !", "No, exit", 0, levelidx + 1);
+          auto res = fl_choice ("Next : Level %i, Continuer ?", "Yes, let go !", "No, exit", 0, levelidx + 1);
           if (res == 1) exit (0);
         }
-      else if (levelidx == -1) game_session_controller.saveScore ();
+      else if (levelidx == -1)
+        {
+
+          if (game_session_controller.saveScore ())
+            {
+              switch (fl_choice ("New HighScore %i", "", "OK", 0, game_session_controller.getScore ()))
+                {
+                  case 1: exit (0);
+                }
+            }
+          else exit (0);
+
+        }
       else exit (0);
+    }
+  else if (game_session_controller.endgame () and !game_session_controller.win ())
+    {
+      auto res = fl_choice ("Level %i : Perdu ! Vous n'avez pas atteint les objectifs, Recommenecr ?", "Oui", "No", 0, levelidx);
+      if (res == 1) exit (0);
+      else
+        {
+          game_session_controller.reset ();
+          Fl::wait (10);
+          game_session_controller.newLevelinit (levelidx);
+        }
     }
 }
 
-int GameSessionViewWindow::handle (int event)
+int GameSessionView::handle (int event)
 {
   switch (event)
     {
@@ -79,9 +102,9 @@ int GameSessionViewWindow::handle (int event)
     }
 }
 
-void GameSessionViewWindow::Timer_CB (void *userdata)
+void GameSessionView::Timer_CB (void *userdata)
 {
-  auto *o = (GameSessionViewWindow *) userdata;
+  auto *o = (GameSessionView *) userdata;
   o->redraw ();
   Fl::repeat_timeout (1.0 / REFRESHPERSECOND, Timer_CB, userdata);
 }

@@ -13,7 +13,3 @@ bool Square::contains (Point p) const
          p.y >= y () &&
          p.y < y () + h ();
 }
-Point Square::get_position () const
-{
-  return {x (), y ()};
-}

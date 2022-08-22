@@ -7,11 +7,22 @@
 #include <set>
 #include <utility>
 #include "Point.hpp"
-#include "../levels/Levels.hpp"
+#include "../model/levels/Levels.hpp"
 
 using namespace std;
 
 class Board {
+ private:
+  Levels level;
+  int **_board = new int *[GRID_DIMENSION];
+  vector<vector<int>> _colors_grid;
+  vector<Point> _aligned_candies_H, _aligned_candies_V, explosion, copy_matchedCells;
+  GameState game_state = PENDING;
+  int _score = 0;
+  int _nummoves;
+  bool win = true;
+  vector<pair<Point, Point>> _possibleswap;
+
  public:
   explicit Board (int idx = -1);
   int **getBoard ();
@@ -25,9 +36,7 @@ class Board {
   void fillGrid ();
   void bomb (Point bombpos);
   int getScore () const;
-  void setScore (int newscore);
   int getNumMoves () const;
-  void SetNumMoves (int numMoves); //#todo use after levels implemented
   void addSwap (Point Source, Point Destination);
   void identifypossibleswap ();
   void loopFillGrid ();
@@ -37,19 +46,7 @@ class Board {
   bool isWinner () const;
   void clearMatchedCells ();
   void regen_color_grid ();
-
-  vector<int> *objectivesgoal ();
- private:
-  Levels level;
-  int **_board = new int *[GRID_DIMENSION];
-  vector<vector<int>> _colors_grid;
-  vector<Point> _aligned_candies_H, _aligned_candies_V, explosion, copy_matchedCells;
-  //        bool bombcause = false;
-  GameState game_state = PENDING;
-  int _score = 0;
-  int _nummoves;
-  bool win = true;
-  vector<pair<Point, Point>> _possibleswap;
+  vector<atomic_int> *getObjectives ();
 
 };
 

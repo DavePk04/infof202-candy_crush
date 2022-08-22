@@ -48,16 +48,15 @@ bool Levels::islevel () const
   return _level;
 }
 
-int Levels::get_levelnumber () const
-{
-  return _idx;
-}
-
 float Levels::get_maxMoves () const
 {
   return _maxMoves;
 }
 
+/**
+ * Check if objectives are attended
+ * @return
+ */
 bool Levels::goalAchieved ()
 {
   for (int i = 0; i < OBJECTIVES; i++)
@@ -68,7 +67,7 @@ bool Levels::goalAchieved ()
   return true;
 }
 
-vector<int> *Levels::getObjectives ()
+vector<atomic_int> *Levels::getObjectives ()
 {
   return _objectives;
 }

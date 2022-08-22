@@ -6,6 +6,12 @@
 
 using namespace std;
 
+/**
+ * This function delete an element from a vector
+ * @param vec
+ * @param num
+ * @return
+ */
 vector<int> delete_ele (vector<int> vec, int num)
 {
   vector<int>::reverse_iterator itr1;
@@ -27,6 +33,9 @@ int Board::getColorAt (int row, int col, int **bd)
   return color;
 }
 
+/**
+ * The grid generator function
+ */
 void Board::gen_color_grid ()
 {
   for (int i = 0; i < GRID_DIMENSION; i++)
@@ -98,7 +107,7 @@ bool Board::is_inBoard (Point pos)
 }
 
 /**
- * This function select Matched cells by Colomn
+ * This function select Matched cells in Colomn
  * @param row
  * @param col
  * @param color
@@ -120,7 +129,7 @@ vector<Point> Board::FindColumnMatchForCell (int row, int col, int color)
 }
 
 /**
- * This function select Matched cells by Row
+ * This function select Matched cells in Row
  * @param row
  * @param col
  * @param color
@@ -186,14 +195,14 @@ bool Board::CheckMatches (bool counted)
 
   for (auto CellToDelete: matchedCells)
     {
-      auto coloridx = _board[CellToDelete.x][CellToDelete.y] - 1;
-      if (coloridx == 8 or coloridx == 9) coloridx = 7;
+      auto objidx = _board[CellToDelete.x][CellToDelete.y] - 1;
+      if (objidx == 8) objidx = 7;
 
       _board[CellToDelete.x][CellToDelete.y] = -1;
       if (counted)
         {
-          if (coloridx >= 0 and level.islevel () and level.getObjectives ()->at (coloridx) != 0)
-            level.getObjectives ()->at (coloridx) = level.getObjectives ()->at (coloridx) - 1;
+          if (objidx > -1 and objidx < 7 and level.islevel () and level.getObjectives ()->at (objidx) > 0)
+            if (level.getObjectives ()->at (objidx) > 0) level.getObjectives ()->at (objidx) = level.getObjectives ()->at (objidx) - 1;
 
           copy_matchedCells.push_back (CellToDelete);
           for (auto dir: DIR)
@@ -205,7 +214,7 @@ bool Board::CheckMatches (bool counted)
                     {
                       _board[pos.x][pos.y] = -1;
                       copy_matchedCells.push_back (pos);
-                      level.getObjectives ()->at (7) = level.getObjectives ()->at (7) - 1;
+                      if (level.getObjectives ()->at (7) > 0) level.getObjectives ()->at (7) = level.getObjectives ()->at (7) - 1;
                     }
                   else if (_board[pos.x][pos.y] == 10)
                     _board[pos.x][pos.y] = 9;
@@ -216,7 +225,7 @@ bool Board::CheckMatches (bool counted)
 
   if (matchedCells.size () > MIN_CANDIES_ALIGNED)
     {
-      auto last = matchedCells.back ();
+      auto last = matchedCells.at (random () % matchedCells.size ());
       _board[last.x][last.y] = -2;
     }
 
@@ -243,7 +252,6 @@ void Board::fillGrid ()
                     {
                       auto aboveColor = getColorAt (toFill - 1, col, _board);
                       auto abovediagColor = getColorAt (toFill - 1, col + 1, _board);
-
                       switch (aboveColor)
                         {
                           case 7: //Wall
@@ -259,18 +267,14 @@ void Board::fillGrid ()
                                       }
                                     else _board[toFill][col] = COLORS_VECT[random () % TOTALCOLOR];
                                   }
-
                               }
                             else if (_board[toFill][col] != 7 and _board[toFill][col] != 9
                                      and _board[toFill][col] != 10)
                               _board[toFill][col] = COLORS_VECT[random () % TOTALCOLOR];
                           break;
-
                           case 8: //Bomb
-//                            bombcause = true;
                             bomb ({toFill, col});
                           break;
-
                           case 9: //Simple Ice
                             if (abovediagColor != 7 and abovediagColor != 9 and abovediagColor != 10)
                               {
@@ -289,7 +293,6 @@ void Board::fillGrid ()
                                      and _board[toFill][col] != 10)
                               _board[toFill][col] = COLORS_VECT[random () % TOTALCOLOR];
                           break;
-
                           case 10: //Double Ice
                             if (abovediagColor != 7 and abovediagColor != 9 and abovediagColor != 10)
                               {
@@ -308,19 +311,15 @@ void Board::fillGrid ()
                                      and _board[toFill][col] != 10)
                               _board[toFill][col] = COLORS_VECT[random () % TOTALCOLOR];
                           break;
-
                           default: //NormalColor
                             if (_board[toFill][col] != 7 and _board[toFill][col] != 9
                                 and _board[toFill][col] != 10)
                               _board[toFill][col] = aboveColor;
                           break;
-
                         }
                     }
-
                   _board[0][col] = COLORS_VECT[random () % TOTALCOLOR];
                 }
-
               else if (getColorAt (row, col, _board) == -2) _board[row][col] = 8;
 
             }
@@ -370,10 +369,12 @@ bool Board::swaps (Point cell_1, Point cell_2)
           game_state = GAME_OVER;
 
           if (level.islevel () and !level.goalAchieved ()) win = false;
-          else win = true;
+          else if (!level.islevel ()) win = true;
+          else if (level.islevel () and level.goalAchieved ()) win = true;
         }
       else if (level.islevel () and level.goalAchieved ())
         {
+          _nummoves = 0;
           game_state = GAME_OVER;
           win = true;
         }
@@ -387,21 +388,15 @@ int Board::getScore () const
   return _score;
 }
 
-void Board::setScore (int newscore)
-{
-  _score = newscore;
-}
-
 int Board::getNumMoves () const
 {
   return _nummoves;
 }
 
-void Board::SetNumMoves (int numMoves)
-{
-  _nummoves = numMoves;
-}
-
+/**
+ * This fonction is called when a bomb explose
+ * @param bombpos
+ */
 void Board::bomb (Point bombpos)
 {
   vector<Point> otherbomb;
@@ -412,8 +407,7 @@ void Board::bomb (Point bombpos)
       auto explosedCell = bombpos + dir;
       if (is_inBoard (explosedCell))
         {
-          if (_board[explosedCell.x][explosedCell.y] < 7 or _board[explosedCell.x][explosedCell.y] == 9
-              or _board[explosedCell.x][explosedCell.y] == 10)
+          if (_board[explosedCell.x][explosedCell.y] != 8 and _board[explosedCell.x][explosedCell.y] != 7)
             {
               if (count (explosion.begin (), explosion.end (), explosedCell) == 0) explosion.push_back (explosedCell);
             }
@@ -423,14 +417,14 @@ void Board::bomb (Point bombpos)
 
   for (auto CellToDelete: explosion)
     {
+      auto objidx = _board[CellToDelete.x][CellToDelete.y] - 1;
+      if (objidx == 8) objidx = 7;
+
       if (_board[CellToDelete.x][CellToDelete.y] == 10) _board[CellToDelete.x][CellToDelete.y] = 9;
       else
         {
-          auto coloridx = _board[CellToDelete.x][CellToDelete.y] - 1;
-          if (coloridx == 8 or coloridx == 9) coloridx = 7;
-
-          if (coloridx >= 0 and coloridx <= 7 and level.islevel () and level.getObjectives ()->at (coloridx) != 0)
-            level.getObjectives ()->at (coloridx) = level.getObjectives ()->at (coloridx) - 1;
+          if (objidx > -1 and objidx < 7 and level.islevel () and level.getObjectives ()->at (objidx) > 0)
+            if (level.getObjectives ()->at (objidx) > 0) level.getObjectives ()->at (objidx) = level.getObjectives ()->at (objidx) - 1;
 
           _board[CellToDelete.x][CellToDelete.y] = -1;
           _score += 1;
@@ -440,7 +434,15 @@ void Board::bomb (Point bombpos)
             {
               auto pos = CellToDelete + dir;
               if (is_inBoard (pos))
-                if (_board[pos.x][pos.y] == 10) _board[pos.x][pos.y] = 9;
+                {
+                  if (_board[pos.x][pos.y] == 10) _board[pos.x][pos.y] = 9;
+                  else if (_board[pos.x][pos.y] == 9)
+                    {
+                      _board[CellToDelete.x][CellToDelete.y] = -1;
+                      if (level.getObjectives ()->at (7) > 0)
+                        level.getObjectives ()->at (7) = level.getObjectives ()->at (7) - 1;
+                    }
+                }
             }
         }
 
@@ -452,6 +454,9 @@ void Board::bomb (Point bombpos)
     }
 }
 
+/*
+ * This function add possible swap
+ */
 void Board::addSwap (Point Source, Point Destination)
 {
   pair<Point, Point> to_add{Source, Destination};
@@ -459,6 +464,9 @@ void Board::addSwap (Point Source, Point Destination)
     _possibleswap.push_back ({Source, Destination});
 }
 
+/**
+ * This function find all the possible swap
+ */
 void Board::identifypossibleswap ()
 {
   _possibleswap.clear ();
@@ -505,6 +513,9 @@ void Board::identifypossibleswap ()
     }
 }
 
+/**
+ * Loop for filling the grid
+ */
 void Board::loopFillGrid ()
 {
   do
@@ -535,6 +546,10 @@ GameState Board::getState () const
 {
   return game_state;
 }
+
+/**
+ * This function is called for generating a newboard
+ */
 void Board::regen_color_grid ()
 {
 
@@ -583,11 +598,13 @@ void Board::regen_color_grid ()
       _board[i][j] = _newboard[i][j];
 
 }
+
 bool Board::isWinner () const
 {
   return win;
 }
-vector<int> *Board::objectivesgoal ()
+
+vector<atomic_int> *Board::getObjectives ()
 {
   return level.getObjectives ();
 }

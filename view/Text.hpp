@@ -15,46 +15,13 @@ class Text {
   int fontSize;
   Fl_Color color;
  public:
-  //Constructor
-  Text (string s1, string s2, Point center, int fontSize = 20, Fl_Color color = FL_BLACK) :
-      s1{s1}, s2{s2}, center{center}, fontSize{fontSize}, color{color}
-  {
-    s = s1 + s2;
-  }
-
-  //Draw
+  Text (string s1, string s2, Point center, Fl_Color color = FL_BLACK, int fontSize = 20);
   void draw ();
-
-  //Setters and getters
-  string getString ()
-  {
-    return s1 + s2;
-  }
-  void setFirstString (const string &newString)
-  {
-    s1 = newString;
-    s = s1 + s2;
-  }
-  void setSecondString (const string &newString)
-  {
-    s2 = newString;
-    s = s1 + s2;
-  }
-
-  int getFontSize ()
-  {
-    return fontSize;
-  }
-  void setFontSize (int newFontSize)
-  {
-    fontSize = newFontSize;
-  }
-  Point getCenter ()
-  {
-    return center;
-  }
-  void setCenter (Point newCenter)
-  {
-    center = newCenter;
-  }
+  string getString ();
+  void setFirstString (const string &newString);
+  void setSecondString (const string &newString);
+  int getFontSize ();
+  void setFontSize (int newFontSize);
+  Point getCenter ();
+  void setCenter (Point newCenter);
 };
