@@ -1,7 +1,3 @@
-//
-// Created by bdmr on 21/08/22.
-//
-
 #include "Gamesessionview.hpp"
 
 #include <FL/Fl_Window.H>
@@ -17,6 +13,11 @@ GameSessionView::GameSessionView (int idx) : Fl_Window (500, 500, WINDOWWIDTH, W
   resizable (this);
   game_session_controller.initiate (levelidx);
 }
+
+/**
+ * method called 60 times per second to display and update cells, score, remainning moves and aims
+ * and handle the end of game
+ */
 void GameSessionView::draw ()
 {
   Fl_Window::draw ();
@@ -83,6 +84,9 @@ void GameSessionView::draw ()
     }
 }
 
+/**
+ * method called 60 times per second to control events on gamesessionview
+ */
 int GameSessionView::handle (int event)
 {
   switch (event)
@@ -102,6 +106,9 @@ int GameSessionView::handle (int event)
     }
 }
 
+/**
+ * this method is called to fixe a time to refresh this window
+*/
 void GameSessionView::Timer_CB (void *userdata)
 {
   auto *o = (GameSessionView *) userdata;

@@ -23,18 +23,6 @@ void Cell::set_color (Fl_Color new_color)
   color = new_color;
 }
 
-void Cell::mouseMove (Point mouseLoc)
-{
-  if (square->contains (mouseLoc))
-    {
-      square->color (FL_WHITE);
-    }
-  else
-    {
-      square->color (color);
-    }
-}
-
 bool Cell::is_selected () const
 {
   return selected;
@@ -49,6 +37,10 @@ Point Cell::get_center () const
   return center;
 }
 
+/**
+ * method that indicates in which cell the mouse is located
+ * 
+ */
 void Cell::change (Fl_Color color_)
 {
   set_color (color_);
@@ -58,6 +50,23 @@ void Cell::change (Fl_Color color_)
 void Cell::draw ()
 {
   square->redraw ();
+}
+
+/**
+ * method that indicates in which cell the mouse is located
+ * 
+ * @param mouseLoc 
+ */
+void Cell::mouseMove (Point mouseLoc)
+{
+  if (square->contains (mouseLoc))
+    {
+      square->color (FL_WHITE);
+    }
+  else
+    {
+      square->color (color);
+    }
 }
 
 void Cell::mouseClick (Point mouseLoc)

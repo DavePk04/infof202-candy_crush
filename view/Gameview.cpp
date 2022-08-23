@@ -6,6 +6,9 @@ int next_compt = 0;
 bool quit = false;
 bool res = true;
 
+/**
+ * initialize all the pages of this window
+ */
 Gameview::Gameview () :
     Fl_Window (500, 500, WINDOWWIDTH, WINDOWHEIGHT, "Candy Crush"),
     name1 ("Ben-David Malyane", "", Point{255, 200}), name2 ("Dave Pikop Pokam ", "", Point{252, 230}),
@@ -60,10 +63,18 @@ Gameview::Gameview () :
   }
 
 }
+
 /*------------------Callback Functions----------------------*/
+
+/**
+ * called to get access the previous page
+ */
 void Gameview::back_cb (Fl_Widget *, void *)
 { G_wiz->prev (); }
 
+/**
+ * called to get access the next page
+ */
 void Gameview::next_cb (Fl_Widget *, void *)
 {
   G_wiz->next ();
@@ -72,6 +83,9 @@ void Gameview::next_cb (Fl_Widget *, void *)
     res = true;
 }
 
+/**
+ * callback function which create a game session window
+ */
 void Gameview::play_cb (Fl_Widget *, void *)
 {
   quit = true;
@@ -82,6 +96,9 @@ void Gameview::play_cb (Fl_Widget *, void *)
   game_session_window->end ();
 }
 
+/**
+ * re-initialize score to 0
+ */
 void Gameview::erase_cb (Fl_Widget *, void *)
 {
   ofstream sv_newscore;
@@ -90,6 +107,9 @@ void Gameview::erase_cb (Fl_Widget *, void *)
   sv_newscore.close ();
 }
 
+/**
+ * called to get access to game session window for the level 1
+ */
 void Gameview::lvl1_cb (Fl_Widget *, void *)
 {
   quit = true;
@@ -100,6 +120,9 @@ void Gameview::lvl1_cb (Fl_Widget *, void *)
   game_session_window->end ();
 }
 
+/**
+ * called to get access to game session window for the level 2
+ */
 void Gameview::lvl2_cb (Fl_Widget *, void *)
 {
   quit = true;
@@ -110,6 +133,9 @@ void Gameview::lvl2_cb (Fl_Widget *, void *)
   game_session_window->end ();
 }
 
+/**
+ * called to get access to game session window for the level 3
+ */
 void Gameview::lvl3_cb (Fl_Widget *, void *)
 {
   quit = true;
@@ -122,10 +148,13 @@ void Gameview::lvl3_cb (Fl_Widget *, void *)
 /*----------------------------------Fin Callback functions----------------------------------------------------------*/
 
 
+/**
+ * called 60 times per second to re-initalize score, write the names and the titles
+ */
 void Gameview::draw ()
 {
   Fl_Window::draw ();
-  if (quit) Fl_Window::hide (); //if a configuration choice is done Hide the gameview window
+  if (quit) Fl_Window::hide (); // if a configuration choice is done Hide the gameview window
 
   if (next_compt == 0) //page 0
     {
