@@ -1,7 +1,7 @@
 #include "Gameview.hpp"
 
 //Setting the page wizard widget
-Fl_Wizard *G_wiz = (Fl_Wizard *) 0;
+Fl_Wizard *G_wiz = (Fl_Wizard *) 0; // Fl_Wizard is credited to https://github.com/cesco345/FLTK/blob/master/wizard.cpp
 int next_compt = 0;
 bool quit = false;
 bool res = true;
@@ -17,8 +17,9 @@ Gameview::Gameview () :
     highScore ("High Score : ", "0", Point{185, 465})
 {
   Fl::add_timeout (1.0 / REFRESHPERSECOND, Timer_CB, this);
+
+  //Fl_Wizard is credited to https://github.com/cesco345/FLTK/blob/master/wizard.cpp
   G_wiz = new Fl_Wizard (0, 0, WINDOWWIDTH, WINDOWHEIGHT);
-  time_t start = time (0);
 
   // Wizard: page 1
   {
